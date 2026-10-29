@@ -1,19 +1,19 @@
-import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.13';
+import {assetBuffer} from './loading-progress.js?v=v0.1.14';
+import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.14';
 import * as THREE from 'three';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.13';
-import {parseCharacter} from './character-loader.js?v=v0.1.13';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.13';
-import {createCharacterSkin} from './master-character.js?v=v0.1.13';
-import {createFighter} from './models.js?v=v0.1.13';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.14';
+import {parseCharacter} from './character-loader.js?v=v0.1.14';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.14';
+import {createCharacterSkin} from './master-character.js?v=v0.1.14';
+import {createFighter} from './models.js?v=v0.1.14';
 const ROOT='./';
 export async function loadRosterCharacter(id){
  const files=id==='master2'?['Master_2_MIXAMO.fbx','Master_2_txt.glb']:['Master_1_MIXAMO.fbx','Capoeira Game_Meshy V6_2026-10-29_02-01-17.glb'];
- const responses=await Promise.all(files.map(path=>fetch(ROOT+path)));if(responses.some(r=>!r.ok))throw Error('Could not load '+id);
- const buffers=await Promise.all(responses.map(r=>r.arrayBuffer()));const [rig,texture]=await Promise.all([parseCharacter(buffers[0],'fbx'),parseCharacter(buffers[1],'glb',false)]);
+ const buffers=await Promise.all(files.map(path=>assetBuffer(ROOT+path)));const [rig,texture]=await Promise.all([parseCharacter(buffers[0],'fbx'),parseCharacter(buffers[1],'glb',false)]);
  transferCharacterMaterials(rig.root,texture.root,{flipY:true});return createCharacterSkin(rig.root);
 }
 export async function loadQuilombo(){
- const {scene:source}=await new GLTFLoader().loadAsync('./1_Quilombo_Meshy.glb');source.updateMatrixWorld(true);
+ const {scene:source}=await new GLTFLoader().parseAsync(await assetBuffer('./1_Quilombo_Meshy.glb'),'');source.updateMatrixWorld(true);
  // Human-scale doorway: shrink the complete set uniformly, including its clearing.
  const origin=new THREE.Vector3(0,0,.48),ray=new THREE.Raycaster(new THREE.Vector3(0,2,.48),new THREE.Vector3(0,-1,0));const hit=ray.intersectObject(source,true)[0];if(!hit)throw Error('Could not locate the Quilombo clearing');origin.y=hit.point.y;
  const group=new THREE.Group();group.name='Quilombo';

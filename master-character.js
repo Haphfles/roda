@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {FBXLoader} from './FBXLoader.js?v=v0.1.13';
-import {clone} from './SkeletonUtils.js?v=v0.1.13';
+import {FBXLoader} from './FBXLoader.js?v=v0.1.14';
+import {clone} from './SkeletonUtils.js?v=v0.1.14';
 const V=()=>new THREE.Vector3(),Q=()=>new THREE.Quaternion(),down=new THREE.Vector3(0,-1,0);
 export async function loadMasterCharacter(){
  const manager=new THREE.LoadingManager();manager.setURLModifier(url=>{if(url.includes('Image_')||url.endsWith('/normal')){const name=url.split('/').at(-1);return './New_Characters/Master_1/textures/'+name+(name==='normal'?'.png':'.jpg');}return url;});

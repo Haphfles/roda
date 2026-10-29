@@ -1,20 +1,22 @@
-import {CommunityCharacters} from './community-characters.js?v=v0.1.13';
-import {SharedCharacters} from './shared-characters.js?v=v0.1.13';
-import {readStats} from './character-stats.mjs?v=v0.1.13';
-import {VoiceControls} from './voice-controls.js?v=v0.1.13';
-import {AnimationBlend} from './animation-blend.mjs?v=v0.1.13';
-import {MobileControls} from './mobile-controls.js?v=v0.1.13';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.13';
-import {availableMoves} from './movement-access.mjs?v=v0.1.13';
-import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.13';
+import {CommunityCharacters} from './community-characters.js?v=v0.1.14';
+import {SharedCharacters} from './shared-characters.js?v=v0.1.14';
+import {readStats} from './character-stats.mjs?v=v0.1.14';
+import {CharacterCarousel} from './character-carousel.js?v=v0.1.14';
+import {loadingDone} from './loading-progress.js?v=v0.1.14';
+import {VoiceControls} from './voice-controls.js?v=v0.1.14';
+import {AnimationBlend} from './animation-blend.mjs?v=v0.1.14';
+import {MobileControls} from './mobile-controls.js?v=v0.1.14';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.14';
+import {availableMoves} from './movement-access.mjs?v=v0.1.14';
+import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.14';
 import * as THREE from 'three';
-import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.13';
-import {loadCharacterAssignment} from './character-loader.js?v=v0.1.13';
-import {MovementStudio} from './studio.js?v=v0.1.13';
-import {Match,MOVES} from './game-core.mjs?v=v0.1.13';
-import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.13';
+import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.14';
+import {loadCharacterAssignment} from './character-loader.js?v=v0.1.14';
+import {MovementStudio} from './studio.js?v=v0.1.14';
+import {Match,MOVES} from './game-core.mjs?v=v0.1.14';
+import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.14';
 const $=id=>document.getElementById(id),keys=new Set(),match=new Match();
-let setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
+let carousel,setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
 const mobile=new MobileControls(document.querySelector('.touch'),key=>{press(key);keys.delete(key);});
 let controlBindings={},hintButtons=[];
 const blends=[new AnimationBlend(),new AnimationBlend()];
@@ -41,7 +43,7 @@ const trailMat=new THREE.LineBasicMaterial({color:'#fff1cb',transparent:true,opa
 function updateCamera(dt){if(match.state==='ready'){camera.position.set(-3.4,3.1,7.4);camera.lookAt(-.7,.85,0);return;}if(match.state!=='paused'){if(keys.has('q'))camTarget-=dt*.95;if(keys.has('e'))camTarget+=dt*.95;}camAngle=THREE.MathUtils.damp(camAngle,camTarget,5,dt);const aspect=$('viewport').clientWidth/$('viewport').clientHeight;const radius=aspect<.8?13.5:aspect<1.25?11.5:9.5;const mx=(match.p.x+match.b.x)*.20,mz=(match.p.z+match.b.z)*.20;camera.position.set(mx+Math.sin(camAngle)*radius,5.2,mz+Math.cos(camAngle)*radius);camera.lookAt(mx,.9,mz);}
 function tick(now){requestAnimationFrame(tick);const dt=Math.min((now-last)/1000||0,.033);last=now;voice.update();mobile.setActive(match.state==='playing'&&!studio?.active);if(studio?.active){studio.tick(dt);return;}const active=match.state!=='paused'&&match.state!=='over';if(active)clock+=dt;match.update(dt,input());
  for(const ev of match.events.splice(0)){if(ev.kind==='end'){const w=match.winner;show(w==='you'?'Beautiful<br><em>game.</em>':w==='draw'?'Perfect<br><em>balance.</em>':'Find your<br><em>rhythm.</em>',`You ${match.p.score} · Rival ${match.b.score}. ${w==='you'?'You win!':w==='draw'?'A draw!':'Your rival wins.'} Step in for another round.`);$('eyebrow').textContent='THE CONVERSATION CONTINUES';tone(w==='you'?550:140,.4);}else{note(ev.text);if(ev.kind==='hit'){burst(ev.target);tone(95,.14,.12);}if(ev.kind==='dodge')tone(440,.12);}}
- const ready=match.state==='ready';rigB.root.visible=!ready;poseFighter(rigP,ready?{...match.p,x:1.6,z:0,heading:.15,action:'idle'}:match.p,clock);poseFighter(rigB,match.b,clock+.7);studio?.pose(rigP,ready?{...match.p,heading:.15,action:'idle'}:match.p,clock);studio?.pose(rigB,match.b,clock+.7);for(const [i,rig,f] of [[0,rigP,match.p],[1,rigB,match.b]])blends[i].update(rig,f,active?dt:0,MOVES[f.action],1.25*moveEffects(f.stats,MOVES[f.action]||{}).speed);for(const s of world.spectators){poseFighter(s.rig,s.f,clock+s.f.x);s.rig.arms.l.upper.rotation.set(-.8,0,-.45);s.rig.arms.r.upper.rotation.set(-.8,0,.45);s.rig.arms.l.lower.rotation.set(-1,0,Math.sin(clock*5)*.2-.5);s.rig.arms.r.lower.rotation.set(-1,0,-Math.sin(clock*5)*.2+.5);}
+ const ready=match.state==='ready';carousel?.update(dt,ready);rigP.root.visible=!ready;rigB.root.visible=!ready;poseFighter(rigP,ready?{...match.p,x:1.6,z:0,heading:.15,action:'idle'}:match.p,clock);poseFighter(rigB,match.b,clock+.7);studio?.pose(rigP,ready?{...match.p,heading:.15,action:'idle'}:match.p,clock);studio?.pose(rigB,match.b,clock+.7);for(const [i,rig,f] of [[0,rigP,match.p],[1,rigB,match.b]])blends[i].update(rig,f,active?dt:0,MOVES[f.action],1.25*moveEffects(f.stats,MOVES[f.action]||{}).speed);for(const s of world.spectators){poseFighter(s.rig,s.f,clock+s.f.x);s.rig.arms.l.upper.rotation.set(-.8,0,-.45);s.rig.arms.r.upper.rotation.set(-.8,0,.45);s.rig.arms.l.lower.rotation.set(-1,0,Math.sin(clock*5)*.2-.5);s.rig.arms.r.lower.rotation.set(-1,0,-Math.sin(clock*5)*.2+.5);}
  rigP.root.position.y=match.p.travelY||0;rigB.root.position.y=match.b.travelY||0;rigP.updateSkin?.();rigB.updateSkin?.();for(const s of world.spectators)s.rig.updateSkin?.();
  if(active){for(const p of particles){p.life-=dt;p.v.y-=dt*4;p.mesh.position.addScaledVector(p.v,dt);p.mesh.material.opacity=Math.max(0,p.life/p.max);}particles=particles.filter(p=>{if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();return false}return true});for(const p of trail)p.life-=dt;trail=trail.filter(p=>p.life>0);scene.updateMatrixWorld(true);addTrail(rigP,match.p);addTrail(rigB,match.b);trailLine.geometry.dispose();trailLine.geometry=new THREE.BufferGeometry().setFromPoints(trail.map(t=>t.p));trailLine.visible=trail.length>1;}
  if(match.state==='playing'){beat+=dt;if(beat>.45){beat=0;tone(Math.floor(clock/.45)%4===0?160:270,.13,.035);}if(clock>calloutUntil)$('callout').textContent=match.practice?'FREE PRACTICE · FOLLOW YOUR MOVEMENT KEYS':'MOVE WITH INTENTION';}updateHud();updateCamera(dt);updateMoveHints();renderer.render(scene,camera);}
@@ -55,9 +57,10 @@ try{
  studio=new MovementStudio({onCharacters(designs){applyCharacter(rigP,designs.player);applyCharacter(rigB,designs.rival);},onOpen(){studioPrevious=match.state;match.state='studio';keys.clear();},onClose(){blends.forEach(b=>b.reset());match.state=studioPrevious;keys.clear();},onTest(id){start(true);match.p.x=-.75;match.b.x=.75;if(id==='knockdown'){match.p.action=id;match.p.t=0;}else match.act(match.p,id);note('TESTING YOUR MOVEMENT · '+(MOVES[id]?.name||id));},onBindings(bindings){refreshControls(bindings);}});await studio.loadPromise;studio.characterPreviewSkin=characterSkins.player;$('studio-open').onclick=()=>studio.open();$('studio-welcome').onclick=()=>studio.open();
  studio.characterRoster=Object.entries(skins).map(([id,skin])=>({id,name:skin.displayName||(id==='master1'?'Master_1':'Master_2')}));
  setup=new GameSetup({skins,worlds,scene,onCharacter(id){studio.setCharacter(id);match.p.characterId=id;match.b.characterId=id==='master1'?'master2':'master1';match.b.stats=readStats(match.b.characterId);refreshControls(studio.bindings);skins[id](rigP);skins[id==='master1'?'master2':'master1'](rigB);studio.characterPreviewSkin=skins[id];if(studio.rig)skins[id](studio.rig);},onStats(stats,effects){match.p.stats={...stats};rigP.root.scale.setScalar((world===worlds.quilombo?1.3:1)*effects.size);},onScenario(id){world=worlds[id];rigP.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.p.stats).size);rigB.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.b.stats).size);match.arenaRadius=world.arenaRadius??4.5;for(const [key,w]of Object.entries(worlds))w.world.visible=key===id;scene.background.set(id==='quilombo'?'#a6b497':'#d5bda1');scene.fog.color.copy(scene.background);},onHome(){keys.clear();for(const p of particles){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();}particles=[];match.reset();match.state='ready';$('title').innerHTML='RODA<span class="title-dot">.</span>';$('description').textContent='Your player. Your place. Your rhythm.';$('eyebrow').textContent='';$('start').textContent='Enter the roda ↗';$('practice').hidden=false;$('pause').textContent='Pause';setup.host.hidden=false;$('overlay').classList.remove('hidden');$('game-controls').hidden=true;$('help').setAttribute('aria-expanded','false');trail=[];trailLine.visible=false;}});
+ carousel=new CharacterCarousel(setup);
  window.addEventListener('roda-build-changed',()=>setup.refreshStats());
  const shared=new SharedCharacters({studio,setup,onApplied(){match.b.stats=readStats(match.b.characterId);rigB.root.scale.setScalar((world===worlds.quilombo?1.3:1)*statEffects(match.b.stats).size);refreshControls(studio.bindings);}});await shared.load();const community=new CommunityCharacters({shared,setup,studio});community.loadCatalog();
- resize();new ResizeObserver(resize).observe($('viewport'));isReady=true;$('start').disabled=false;$('practice').disabled=false;$('start').textContent='Enter the roda ↗';$('load-status').textContent='A game of movement & rhythm';requestAnimationFrame(tick);
+ resize();new ResizeObserver(resize).observe($('viewport'));isReady=true;loadingDone();$('start').disabled=false;$('practice').disabled=false;$('start').textContent='Enter the roda ↗';$('load-status').textContent='A game of movement & rhythm';requestAnimationFrame(tick);
  // Read-only diagnostics for repeatable browser smoke tests.
  window.ginga={match,scene,renderer,rigP,rigB,get ready(){return isReady},get cameraAngle(){return camAngle}};
 }catch(error){console.error(error);$('error').hidden=false;$('error').innerHTML='<h2>The 3D renderer couldn’t start.</h2><p>Check your connection and reload in a browser with WebGL 2 enabled.</p>';const detail=document.createElement('p');detail.textContent='Details: '+error.message;$('error').appendChild(detail);$('overlay').classList.add('hidden');}
@@ -66,4 +69,4 @@ window.addEventListener('keydown',e=>{if(studio?.active||e.target instanceof HTM
 for(const b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);press(b.dataset.key);});for(const event of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(b.dataset.key));}
 $('start').onclick=()=>{if(match.state==='paused')pause();else start(false);$('start').blur();};$('practice').onclick=()=>{start(true);$('practice').blur();};$('pause').onclick=pause;$('camera').onclick=()=>{cameraMode=(cameraMode+1)%4;camTarget=.12+cameraMode*Math.PI/2;};$('sound').onclick=async()=>{sound=!sound;if(sound){try{audio??=new(window.AudioContext||window.webkitAudioContext)();await audio.resume();tone(240);}catch{sound=false;note('Audio is unavailable in this browser');}}$('sound').textContent=sound?'Sound on':'Sound off';};
 
-$('help').onclick=()=>{mobile.setMoves(rows);const panel=$('game-controls');panel.hidden=!panel.hidden;$('help').setAttribute('aria-expanded',String(!panel.hidden));};
+$('help').onclick=()=>{const panel=$('game-controls');panel.hidden=!panel.hidden;$('help').setAttribute('aria-expanded',String(!panel.hidden));};

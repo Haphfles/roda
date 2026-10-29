@@ -1,4 +1,4 @@
-import {Vector3,Quaternion} from './three.module.js?v=v0.1.13';
+import {Vector3,Quaternion} from './three.module.js?v=v0.1.14';
 export const LIMBS={handL:['arms','l','hand','armLU','armLL'],handR:['arms','r','hand','armRU','armRL'],footL:['legs','l','foot','legLU','legLL'],footR:['legs','r','foot','legRU','legRL']};
 export function chain(rig,key){const [group,side,end]=LIMBS[key];const limb=rig[group][side];return{upper:limb.upper,lower:limb.lower,end:limb[end]};}
 const position=o=>o.getWorldPosition(new Vector3());

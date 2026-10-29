@@ -1,6 +1,6 @@
-import * as THREE from './three.module.js';
-import {clone,samplePose,applyPose,capturePose} from './movement-data.mjs?v=fall-2';
-import {LIMBS,chain,solveIK,bendPole,bodyAnchors,solveBodyHeight} from './studio-ik.mjs';
+import * as THREE from './three.module.js?v=v0.1.11';
+import {clone,samplePose,applyPose,capturePose} from './movement-data.mjs?v=v0.1.11';
+import {LIMBS,chain,solveIK,bendPole,bodyAnchors,solveBodyHeight} from './studio-ik.mjs?v=v0.1.11';
 const $=id=>document.getElementById(id);
 export class StudioTools{
  constructor(studio){this.s=studio;this.selected='torso';this.enabled=true;this.handles=[];this.selection=new Set();this.installTimeline();this.installIK();this.installReset();}

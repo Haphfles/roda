@@ -1,15 +1,15 @@
-import {MoveCreditsEditor} from './move-credits-editor.js';
-import {MovementAccessEditor} from './movement-access-editor.js';
-import {sampleTravel} from './root-motion.mjs';
-import {TravelEditor} from './travel-editor.js';
-import {MixamoImport} from './mixamo-import.js';
-import {DEFAULTS} from './character-data.mjs';
-import {StudioTools} from './studio-tools.js';
-import {MotionCapture} from './motion-capture.js';
+import {MoveCreditsEditor} from './move-credits-editor.js?v=v0.1.11';
+import {MovementAccessEditor} from './movement-access-editor.js?v=v0.1.11';
+import {sampleTravel} from './root-motion.mjs?v=v0.1.11';
+import {TravelEditor} from './travel-editor.js?v=v0.1.11';
+import {MixamoImport} from './mixamo-import.js?v=v0.1.11';
+import {DEFAULTS} from './character-data.mjs?v=v0.1.11';
+import {StudioTools} from './studio-tools.js?v=v0.1.11';
+import {MotionCapture} from './motion-capture.js?v=v0.1.11';
 import * as THREE from 'three';
-import {createFighter,poseFighter,applyCharacter} from './models.js';
-import {MOVES,KNOCKDOWN} from './game-core.mjs';
-import {JOINTS,BINDINGS,FORMAT,clone,rigJoints,capturePose,applyPose,samplePose,mirrorPose,moveSpec,validateMove,validateBundle,removeMovement} from './movement-data.mjs?v=fall-2';
+import {createFighter,poseFighter,applyCharacter} from './models.js?v=v0.1.11';
+import {MOVES,KNOCKDOWN} from './game-core.mjs?v=v0.1.11';
+import {JOINTS,BINDINGS,FORMAT,clone,rigJoints,capturePose,applyPose,samplePose,mirrorPose,moveSpec,validateMove,validateBundle,removeMovement} from './movement-data.mjs?v=v0.1.11';
 const $=id=>document.getElementById(id),DEG=180/Math.PI,STORE='roda-online-studio-v1';
 function neutralPose(){const rig=createFighter();const pose=capturePose(rig);pose.height=.925;return pose;}
 function defaults(){const rig=createFighter();return[['idle','Ginga','pose',1.53],['kick','Meia-lua','attack',.66],['spin','Armada','attack',1.16],['dodge','Esquiva','dodge',.76],['knockdown','Fall · knockdown','pose',.5]].map(([id,name,kind,duration])=>{const spec=MOVES[id]||{};const frames=[];for(let i=0;i<=24;i++){const u=i/24;poseFighter(rig,{x:0,z:0,heading:0,action:id,t:u*duration,flash:0},id==='idle'?u*duration:0);frames.push({u,ease:'linear',pose:capturePose(rig)});}return{id,name,kind,duration,cost:spec.cost||0,damage:spec.damage||0,range:spec.range||1.5,contact:spec.contact?spec.contact/duration:.5,frames};});}

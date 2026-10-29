@@ -1,5 +1,5 @@
-import {characterLibrary,mergeCharacterLibrary} from './shared-character-data.mjs';
-import {readStats,setSharedStats} from './character-stats.mjs';
+import {characterLibrary,mergeCharacterLibrary} from './shared-character-data.mjs?v=v0.1.11';
+import {readStats,setSharedStats} from './character-stats.mjs?v=v0.1.11';
 const EMAILS={master1:'master1@characters.roda.invalid',master2:'master2@characters.roda.invalid',custom_6c62be0efb355e236f508a9adab319fb:'energia@characters.roda.invalid'};
 export class SharedCharacters{
  constructor({studio,setup,onApplied}){this.studio=studio;this.setup=setup;this.onApplied=onApplied;this.rows=new Map();this.session=null;this.busy=false;this.mount();}

@@ -1,4 +1,4 @@
-# RODA v0.1.0
+# RODA v0.1.2
 A browser-based capoeira game. Two fighters, two scenarios, six curated movements.
 
 Play: https://haphfles.github.io/roda/

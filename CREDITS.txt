@@ -1,0 +1,7 @@
+RODA — early playable demo
+Characters and Quilombo scene: user-supplied Meshy assets.
+Character rigging and source animation workflow: Mixamo; supplied by the project owner.
+Game, Salvador scene, animation editing and retargeting: custom project code.
+Three.js r170 and loaders: MIT; see THREE-LICENSE.txt.
+fflate: MIT; notice included in fflate.module.js.
+An arcade interpretation of capoeira, not an instructional simulation.

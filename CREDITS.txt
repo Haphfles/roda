@@ -5,3 +5,5 @@ Game, Salvador scene, animation editing and retargeting: custom project code.
 Three.js r170 and loaders: MIT; see THREE-LICENSE.txt.
 fflate: MIT; notice included in fflate.module.js.
 An arcade interpretation of capoeira, not an instructional simulation.
+
+MediaPipe Tasks Vision and pose model: see MEDIAPIPE-LICENSE.txt.

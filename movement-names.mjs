@@ -1,0 +1,3 @@
+export const nameKey=name=>String(name).normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en');
+export function checkMovementName(move,moves){const name=String(move.name||'').trim().replace(/\s+/g,' ');if(!name||name.length>48)throw Error('Use a movement name of 1–48 characters.');if(moves.some(m=>m.id!==move.id&&(m.creditKey||m.id)!==(move.creditKey||move.id)&&nameKey(m.name)===nameKey(name)))throw Error('A movement named “'+name+'” already exists. Choose another name.');return name;}
+export function unusedMovementName(base,moves){let name=base.slice(0,48),n=2;while(moves.some(m=>nameKey(m.name)===nameKey(name))){const suffix=' '+n++;name=base.slice(0,48-suffix.length)+suffix;}return name;}

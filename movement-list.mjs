@@ -1,3 +1,3 @@
-import {nameKey} from './movement-names.mjs?v=v0.1.19';
-import {canUseMove} from './movement-access.mjs?v=v0.1.19';
+import {nameKey} from './movement-names.mjs?v=v0.1.20';
+import {canUseMove} from './movement-access.mjs?v=v0.1.20';
 export function movementGroups(bundle,characterId){const groups=new Map(),links=bundle.characterAnimations?.[characterId]||{},bindings=bundle.characterBindings?.[characterId]||bundle.bindings||{};for(const m of bundle.moves){const key=nameKey(m.name);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(m);}return [...groups.values()].map(variants=>{const role=variants.map(m=>m.creditKey||m.id).find(k=>['idle','knockdown'].includes(k));const score=m=>(Object.values(links).includes(m.id)?100:0)+(Object.values(bindings).includes(m.id)?50:0)+(m.characters?.includes(characterId)?20:0)+(!m.characters?10:0);const move=[...variants].sort((a,b)=>score(b)-score(a))[0];const checked=role?(links[role]!==null&&variants.some(m=>m.id===(links[role]||role))):variants.some(m=>canUseMove(m,characterId));return {move,variants,role,checked};});}

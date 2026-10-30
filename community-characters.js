@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import {parseCharacter} from './character-loader.js?v=v0.1.19';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.19';
-import {createCharacterSkin} from './master-character.js?v=v0.1.19';
-import {createFighter,poseFighter} from './models.js?v=v0.1.19';
+import {parseCharacter} from './character-loader.js?v=v0.1.20';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.20';
+import {createCharacterSkin} from './master-character.js?v=v0.1.20';
+import {createFighter,poseFighter} from './models.js?v=v0.1.20';
 const MAX=25*1024*1024,BUCKET='roda-models';
 export const submissionCharacterId=id=>'custom_'+id.replaceAll('-','');
 export function checkModelFiles(model,texture){if(!model||! /\.(fbx|glb)$/i.test(model.name))throw Error('Choose a rigged FBX or GLB.');if(model.size>MAX||texture?.size>MAX)throw Error('Each file must be 25 MB or smaller.');if(texture&&!/\.glb$/i.test(texture.name))throw Error('Use a GLB with embedded textures.');}

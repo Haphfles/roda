@@ -1,11 +1,11 @@
-import {assetBuffer} from './loading-progress.js?v=v0.1.19';
-import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.19';
+import {assetBuffer} from './loading-progress.js?v=v0.1.20';
+import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.20';
 import * as THREE from 'three';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.19';
-import {parseCharacter} from './character-loader.js?v=v0.1.19';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.19';
-import {createCharacterSkin} from './master-character.js?v=v0.1.19';
-import {createFighter} from './models.js?v=v0.1.19';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.20';
+import {parseCharacter} from './character-loader.js?v=v0.1.20';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.20';
+import {createCharacterSkin} from './master-character.js?v=v0.1.20';
+import {createFighter} from './models.js?v=v0.1.20';
 const ROOT='./';
 export async function loadRosterCharacter(id){
  const files=id==='master2'?['Master_2_MIXAMO.fbx','Master_2_txt.glb']:['Master_1_MIXAMO.fbx','Capoeira Game_Meshy V6_2026-10-29_02-01-17.glb'];
@@ -27,7 +27,7 @@ export async function loadQuilombo(){
 }
 export function readSetup(storage=localStorage){try{const data=JSON.parse(storage.getItem('roda-setup-v1'));return {character:typeof data?.character==='string'?data.character:'master1',scenario:data?.scenario==='quilombo'?'quilombo':'courtyard'};}catch{return {character:'master1',scenario:'courtyard'};}}
 export class GameSetup{
- constructor({skins,worlds,scene,onCharacter,onScenario,onHome,onStats}){this.onStats=onStats;this.skins=skins;this.worlds=worlds;this.scene=scene;this.onCharacter=onCharacter;this.onScenario=onScenario;this.selection=readSetup();if(!skins[this.selection.character])this.selection.character='master1';const host=document.createElement('div');host.id='setup-picker';host.innerHTML=`<div class="setup-label">01 <span>Choose your player</span></div><div class="setup-options character-options" role="group" aria-label="Choose your player"><button type="button" data-character="master1" aria-pressed="false"><img alt="Master 1 character preview"><span>Master_1</span><i>01</i></button><button type="button" data-character="master2" aria-pressed="false"><img alt="Master 2 character preview"><span>Master_2</span><i>02</i></button></div><div class="setup-label">02 <span>Choose your scenario</span></div><div class="setup-options scenario-options" role="group" aria-label="Choose your scenario"><button type="button" data-scenario="courtyard" aria-pressed="false"><img alt="Salvador courtyard preview"><span>Salvador</span><small>The courtyard</small></button><button type="button" data-scenario="quilombo" aria-pressed="false"><img alt="Quilombo tropical clearing preview"><span>Quilombo</span><small>The clearing</small></button></div><p id="setup-summary" aria-live="polite"></p>`;document.querySelector('.welcome').insertBefore(host,document.querySelector('.actions'));this.host=host;
+ constructor({skins,worlds,scene,onCharacter,onScenario,onHome,onStats}){this.onStats=onStats;this.skins=skins;this.worlds=worlds;this.scene=scene;this.onCharacter=onCharacter;this.onScenario=onScenario;this.selection=readSetup();if(!skins[this.selection.character])this.selection.character='master1';const host=document.createElement('div');host.id='setup-picker';host.innerHTML=`<div class="setup-label">01 <span>Choose your player</span></div><div class="setup-options character-options" role="group" aria-label="Choose your player"><button type="button" data-character="master1" aria-pressed="false"><img alt="Master 1 character preview"><span>Master_1</span><i>01</i></button><button type="button" data-character="master2" aria-pressed="false"><img alt="Master 2 character preview"><span>Master_2</span><i>02</i></button></div><div class="setup-label">02 <span>Choose your scenario</span></div><div class="setup-options scenario-options" role="group" aria-label="Choose your scenario"><button type="button" data-scenario="courtyard" aria-pressed="false"><img alt="Salvador courtyard preview"><span>Salvador</span><small>The courtyard</small></button><button type="button" data-scenario="quilombo" aria-pressed="false"><img alt="Quilombo tropical clearing preview"><span>Quilombo</span><small>The clearing</small></button></div><p id="setup-summary" aria-live="polite"></p>`;document.querySelector('.welcome').insertBefore(host,document.querySelector('.actions'));this.host=host;host.querySelector('.scenario-options').after(document.querySelector('.actions'));
  this.renderCharacterCards();for(const button of host.querySelectorAll('[data-character]'))button.onclick=()=>this.choose('character',button.dataset.character);for(const button of host.querySelectorAll('[data-scenario]'))button.onclick=()=>this.choose('scenario',button.dataset.scenario);
  const home=document.createElement('button');home.id='setup-home';home.textContent='Change setup';document.querySelector('#app nav').prepend(home);home.onclick=onHome;
  this.mountStats();this.makeThumbnails();this.onCharacter(this.selection.character);this.onScenario(this.selection.scenario);this.refresh();

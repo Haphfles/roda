@@ -1,21 +1,21 @@
-import {CommunityCharacters} from './community-characters.js?v=v0.1.19';
-import {SharedCharacters} from './shared-characters.js?v=v0.1.19';
-import {readStats} from './character-stats.mjs?v=v0.1.19';
-import {StudioFighters} from './studio-fighters.js?v=v0.1.19';
-import {CharacterCarousel} from './character-carousel.js?v=v0.1.19';
-import {loadingDone} from './loading-progress.js?v=v0.1.19';
-import {VoiceControls} from './voice-controls.js?v=v0.1.19';
-import {AnimationBlend} from './animation-blend.mjs?v=v0.1.19';
-import {MobileControls} from './mobile-controls.js?v=v0.1.19';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.19';
-import {availableMoves} from './movement-access.mjs?v=v0.1.19';
-import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.19';
+import {CommunityCharacters} from './community-characters.js?v=v0.1.20';
+import {SharedCharacters} from './shared-characters.js?v=v0.1.20';
+import {readStats} from './character-stats.mjs?v=v0.1.20';
+import {StudioFighters} from './studio-fighters.js?v=v0.1.20';
+import {CharacterCarousel} from './character-carousel.js?v=v0.1.20';
+import {loadingDone} from './loading-progress.js?v=v0.1.20';
+import {VoiceControls} from './voice-controls.js?v=v0.1.20';
+import {AnimationBlend} from './animation-blend.mjs?v=v0.1.20';
+import {MobileControls} from './mobile-controls.js?v=v0.1.20';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.20';
+import {availableMoves} from './movement-access.mjs?v=v0.1.20';
+import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.20';
 import * as THREE from 'three';
-import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.19';
-import {loadCharacterAssignment} from './character-loader.js?v=v0.1.19';
-import {MovementStudio} from './studio.js?v=v0.1.19';
-import {Match,MOVES} from './game-core.mjs?v=v0.1.19';
-import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.19';
+import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.20';
+import {loadCharacterAssignment} from './character-loader.js?v=v0.1.20';
+import {MovementStudio} from './studio.js?v=v0.1.20';
+import {Match,MOVES} from './game-core.mjs?v=v0.1.20';
+import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.20';
 const $=id=>document.getElementById(id),keys=new Set(),match=new Match();
 let carousel,setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
 const mobile=new MobileControls(document.querySelector('.touch'),key=>{press(key);keys.delete(key);});
@@ -33,7 +33,7 @@ const hintPoint=new THREE.Vector3();
 function updateMoveHints(){moveHints.hidden=match.state!=='playing';if(moveHints.hidden)return;hintPoint.set(match.p.x,0,match.p.z).project(camera);const w=$('viewport').clientWidth,h=$('viewport').clientHeight;moveHints.style.left=Math.max(8,Math.min(w-moveHints.offsetWidth-8,(hintPoint.x+1)*w/2-moveHints.offsetWidth/2))+'px';moveHints.style.top=Math.max(145,Math.min(h-moveHints.offsetHeight-12,(1-hintPoint.y)*h/2+18))+'px';for(const row of hintButtons){row.button.classList.toggle('active',row.id===match.p.action);row.button.classList.toggle('low-energy',!!row.id&&match.p.energy<MOVES[row.id].cost);}const dodge=resolveMovement(' ',controlBindings,availableMoves(MOVES,match.p.characterId));$('move-hint-status').textContent=match.p.action==='knockdown'?'Recovering…':match.p.action!=='idle'?'Performing '+(MOVES[match.p.action]?.name||'movement')+'…':dodge?'Space · '+MOVES[dodge].name+'  |  Ready':'Ready · assign a dodge in Studio to use Space';}
 function note(text){$('callout').textContent=text;calloutUntil=clock+2;}
 function tone(freq,duration=.1,gain=.07){if(!sound||!audio)return;const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(freq*.45,audio.currentTime+duration);g.gain.setValueAtTime(gain,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration);}
-function show(title,text,button='Play again ↗'){if(setup)setup.host.hidden=true; $('title').innerHTML=title;$('description').textContent=text;$('start').textContent=button;$('practice').hidden=match.state==='paused';$('overlay').classList.remove('hidden');}
+function show(title,text,button='Play again ↗'){if(setup){setup.host.after(document.querySelector('.actions'));setup.host.hidden=true;} $('title').innerHTML=title;$('description').textContent=text;$('start').textContent=button;$('practice').hidden=match.state==='paused';$('overlay').classList.remove('hidden');}
 function start(practice=false){if(!isReady)return;blends.forEach(b=>b.reset());match.reset(practice);rigP.root.visible=true;rigB.root.visible=true;keys.clear();for(const p of particles){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();}particles=[];trail=[];$('overlay').classList.add('hidden');$('pause').textContent='Pause';$('round').textContent=practice?'FREE PRACTICE':'THE RODA';note(practice?'FREE PRACTICE · TRY YOUR SAVED MOVEMENTS':'AXÉ! · ENTER THE CONVERSATION');updateHud();}
 function pause(){if(studio?.active)return;if(match.state==='playing'){match.state='paused';keys.clear();$('pause').textContent='Resume';show('Take a<br><em>breath.</em>','The roda will be here when you’re ready.','Back to the roda ↗');}else if(match.state==='paused'){match.state='playing';$('overlay').classList.add('hidden');$('pause').textContent='Pause';}}
 function updateHud(){for(const[f,k]of[[match.p,'P'],[match.b,'B']]){$('score'+k).textContent=String(f.score).padStart(2,'0');$('hp'+k).style.width=f.hp+'%';$('ep'+k).style.width=f.energy+'%';}$('time').textContent=match.practice?'∞':Math.ceil(match.time);}
@@ -57,7 +57,7 @@ try{
  world=createWorld(scene);worlds={courtyard:world,quilombo};quilombo.world.visible=false;scene.add(quilombo.world);rigP=createFighter('#81baa3','#80583f');rigB=createFighter('#ce815e','#684631',1);characterSkins.player(rigP);characterSkins.rival(rigB);scene.add(rigP.root,rigB.root);trailLine=new THREE.Line(new THREE.BufferGeometry(),trailMat);scene.add(trailLine);
  studio=new MovementStudio({onCharacters(designs){applyCharacter(rigP,designs.player);applyCharacter(rigB,designs.rival);},onOpen(){studioPrevious=match.state;match.state='studio';keys.clear();},onClose(){blends.forEach(b=>b.reset());match.state=studioPrevious;keys.clear();},onTest(id){start(true);match.p.x=-.75;match.b.x=.75;if(id==='knockdown'){match.p.action=id;match.p.t=0;}else match.act(match.p,id);note('TESTING YOUR MOVEMENT · '+(MOVES[id]?.name||id));},onBindings(bindings){refreshControls(bindings);}});await studio.loadPromise;studio.characterPreviewSkin=characterSkins.player;$('studio-open').onclick=()=>studio.open();$('studio-welcome').onclick=()=>studio.open();
  studio.characterRoster=Object.entries(skins).map(([id,skin])=>({id,name:skin.displayName||(id==='master1'?'Master_1':'Master_2')}));
- setup=new GameSetup({skins,worlds,scene,onCharacter(id){studio.setCharacter(id);match.p.characterId=id;match.b.characterId=id==='master1'?'master2':'master1';match.b.stats=readStats(match.b.characterId);refreshControls(studio.bindings);skins[id](rigP);skins[id==='master1'?'master2':'master1'](rigB);studio.characterPreviewSkin=skins[id];if(studio.rig)skins[id](studio.rig);},onStats(stats,effects){match.p.stats={...stats};rigP.root.scale.setScalar((world===worlds.quilombo?1.3:1)*effects.size);},onScenario(id){world=worlds[id];rigP.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.p.stats).size);rigB.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.b.stats).size);match.arenaRadius=world.arenaRadius??4.5;for(const [key,w]of Object.entries(worlds))w.world.visible=key===id;scene.background.set(id==='quilombo'?'#a6b497':'#d5bda1');scene.fog.color.copy(scene.background);},onHome(){keys.clear();for(const p of particles){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();}particles=[];match.reset();match.state='ready';$('title').innerHTML='RODA<span class="title-dot">.</span>';$('description').textContent='Your player. Your place. Your rhythm.';$('eyebrow').textContent='';$('start').textContent='Enter the roda ↗';$('practice').hidden=false;$('pause').textContent='Pause';setup.host.hidden=false;$('overlay').classList.remove('hidden');$('game-controls').hidden=true;$('help').setAttribute('aria-expanded','false');trail=[];trailLine.visible=false;}});
+ setup=new GameSetup({skins,worlds,scene,onCharacter(id){studio.setCharacter(id);match.p.characterId=id;match.b.characterId=id==='master1'?'master2':'master1';match.b.stats=readStats(match.b.characterId);refreshControls(studio.bindings);skins[id](rigP);skins[id==='master1'?'master2':'master1'](rigB);studio.characterPreviewSkin=skins[id];if(studio.rig)skins[id](studio.rig);},onStats(stats,effects){match.p.stats={...stats};rigP.root.scale.setScalar((world===worlds.quilombo?1.3:1)*effects.size);},onScenario(id){world=worlds[id];rigP.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.p.stats).size);rigB.root.scale.setScalar((id==='quilombo'?1.3:1)*statEffects(match.b.stats).size);match.arenaRadius=world.arenaRadius??4.5;for(const [key,w]of Object.entries(worlds))w.world.visible=key===id;scene.background.set(id==='quilombo'?'#a6b497':'#d5bda1');scene.fog.color.copy(scene.background);},onHome(){keys.clear();for(const p of particles){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();}particles=[];match.reset();match.state='ready';$('title').innerHTML='RODA<span class="title-dot">.</span>';$('description').textContent='Your player. Your place. Your rhythm.';$('eyebrow').textContent='';$('start').textContent='Enter the roda ↗';$('practice').hidden=false;$('pause').textContent='Pause';setup.host.querySelector('.scenario-options').after(document.querySelector('.actions'));setup.host.hidden=false;$('overlay').classList.remove('hidden');$('game-controls').hidden=true;$('help').setAttribute('aria-expanded','false');trail=[];trailLine.visible=false;}});
  new StudioFighters(setup,studio);carousel=new CharacterCarousel(setup);
  window.addEventListener('roda-build-changed',()=>setup.refreshStats());
  const shared=new SharedCharacters({studio,setup,onApplied(){match.b.stats=readStats(match.b.characterId);rigB.root.scale.setScalar((world===worlds.quilombo?1.3:1)*statEffects(match.b.stats).size);refreshControls(studio.bindings);}});await shared.load();const community=new CommunityCharacters({shared,setup,studio});await community.loadCatalog();

@@ -44,8 +44,8 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-import * as fflate from './fflate.module.js?v=v0.1.22';
-import { NURBSCurve } from './NURBSCurve.js?v=v0.1.22';
+import * as fflate from './fflate.module.js?v=v0.1.23';
+import { NURBSCurve } from './NURBSCurve.js?v=v0.1.23';
 
 /**
  * Loader loads FBX file and generates Group representing FBX scene.

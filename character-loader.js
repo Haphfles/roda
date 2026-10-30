@@ -1,9 +1,9 @@
-import {assetBuffer} from './loading-progress.js?v=v0.1.20';
+import {assetBuffer} from './loading-progress.js?v=v0.1.22';
 import * as THREE from 'three';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.20';
-import {FBXLoader} from './FBXLoader.js?v=v0.1.20';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.20';
-import {createCharacterSkin} from './master-character.js?v=v0.1.20';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.22';
+import {FBXLoader} from './FBXLoader.js?v=v0.1.22';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.22';
+import {createCharacterSkin} from './master-character.js?v=v0.1.22';
 const $=id=>document.getElementById(id),white='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aMZkAAAAASUVORK5CYII=';
 export async function parseCharacter(buffer,ext,requireRig=true){
  const manager=new THREE.LoadingManager();let missing=false;const urls=[];

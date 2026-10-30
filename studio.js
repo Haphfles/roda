@@ -1,18 +1,18 @@
-import {directFall} from './hit-direction.mjs?v=v0.1.20';
-import {StudioCreate} from './studio-create.js?v=v0.1.20';
-import {checkMovementName,unusedMovementName} from './movement-names.mjs?v=v0.1.20';
-import {MoveCreditsEditor} from './move-credits-editor.js?v=v0.1.20';
-import {MovementAccessEditor} from './movement-access-editor.js?v=v0.1.20';
-import {sampleTravel} from './root-motion.mjs?v=v0.1.20';
-import {TravelEditor} from './travel-editor.js?v=v0.1.20';
-import {MixamoImport} from './mixamo-import.js?v=v0.1.20';
-import {DEFAULTS} from './character-data.mjs?v=v0.1.20';
-import {StudioTools} from './studio-tools.js?v=v0.1.20';
-import {MotionCapture} from './motion-capture.js?v=v0.1.20';
+import {directFall} from './hit-direction.mjs?v=v0.1.22';
+import {StudioCreate} from './studio-create.js?v=v0.1.22';
+import {checkMovementName,unusedMovementName} from './movement-names.mjs?v=v0.1.22';
+import {MoveCreditsEditor} from './move-credits-editor.js?v=v0.1.22';
+import {MovementAccessEditor} from './movement-access-editor.js?v=v0.1.22';
+import {sampleTravel} from './root-motion.mjs?v=v0.1.22';
+import {TravelEditor} from './travel-editor.js?v=v0.1.22';
+import {MixamoImport} from './mixamo-import.js?v=v0.1.22';
+import {DEFAULTS} from './character-data.mjs?v=v0.1.22';
+import {StudioTools} from './studio-tools.js?v=v0.1.22';
+import {MotionCapture} from './motion-capture.js?v=v0.1.22';
 import * as THREE from 'three';
-import {createFighter,poseFighter,applyCharacter} from './models.js?v=v0.1.20';
-import {MOVES,KNOCKDOWN} from './game-core.mjs?v=v0.1.20';
-import {JOINTS,BINDINGS,FORMAT,clone,rigJoints,capturePose,applyPose,samplePose,mirrorPose,moveSpec,validateMove,validateBundle,removeMovement} from './movement-data.mjs?v=v0.1.20';
+import {createFighter,poseFighter,applyCharacter} from './models.js?v=v0.1.22';
+import {MOVES,KNOCKDOWN} from './game-core.mjs?v=v0.1.22';
+import {JOINTS,BINDINGS,FORMAT,clone,rigJoints,capturePose,applyPose,samplePose,mirrorPose,moveSpec,validateMove,validateBundle,removeMovement} from './movement-data.mjs?v=v0.1.22';
 const $=id=>document.getElementById(id),DEG=180/Math.PI,STORE='roda-online-studio-v1';
 function neutralPose(){const rig=createFighter();const pose=capturePose(rig);pose.height=.925;return pose;}
 function defaults(){const rig=createFighter();return[['idle','Ginga','pose',1.53],['kick','Meia-lua','attack',.66],['spin','Armada','attack',1.16],['dodge','Esquiva','dodge',.76],['knockdown','Fall · knockdown','pose',.5]].map(([id,name,kind,duration])=>{const spec=MOVES[id]||{};const frames=[];for(let i=0;i<=24;i++){const u=i/24;poseFighter(rig,{x:0,z:0,heading:0,action:id,t:u*duration,flash:0},id==='idle'?u*duration:0);frames.push({u,ease:'linear',pose:capturePose(rig)});}return{id,name,kind,duration,cost:spec.cost||0,damage:spec.damage||0,range:spec.range||1.5,contact:spec.contact?spec.contact/duration:.5,frames};});}

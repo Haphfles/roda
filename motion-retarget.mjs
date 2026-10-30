@@ -1,5 +1,5 @@
-import {Vector3,Quaternion,Matrix4,Euler} from './three.module.js?v=v0.1.17';
-import {JOINTS,clone,mirrorPose,validateMove,samplePose} from './movement-data.mjs?v=v0.1.17';
+import {Vector3,Quaternion,Matrix4,Euler} from './three.module.js?v=v0.1.19';
+import {JOINTS,clone,mirrorPose,validateMove,samplePose} from './movement-data.mjs?v=v0.1.19';
 export const BODY=[11,12,13,14,15,16,23,24,25,26,27,28];
 export const CONNECTIONS=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,29],[29,31],[28,30],[30,32],[15,19],[16,20],[0,7],[0,8]];
 const down=new Vector3(0,-1,0),forward=new Vector3(0,0,1),UP=new Vector3(0,1,0),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

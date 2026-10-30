@@ -1,0 +1,6 @@
+// Infer the horizontal sweep near contact in the attacker's local space.
+function rotate(v,a){const [x,y,z]=a,c=Math.cos,s=Math.sin;let [vx,vy,vz]=v;[vx,vy]=[c(z)*vx-s(z)*vy,s(z)*vx+c(z)*vy];[vx,vz]=[c(y)*vx+s(y)*vz,-s(y)*vx+c(y)*vz];return [vx,c(x)*vy-s(x)*vz,s(x)*vy+c(x)*vz];}
+function foot(p,side){const lower=rotate([0,-.44,0],p['leg'+side+'L']);lower[1]-=.45;let v=rotate(lower,p['leg'+side+'U']);v[0]+=side==='L'?-.16:.16;return rotate(rotate(v,p.hips),p.root);}
+export function inferImpactTurn(before,after){const yaw=after.root[1]-before.root[1]+after.hips[1]-before.hips[1];if(Math.abs(yaw)>.025)return Math.sign(yaw);const deltas=['L','R'].map(side=>{const a=foot(before,side),b=foot(after,side);return {x:b[0]-a[0],speed:Math.hypot(b[0]-a[0],b[2]-a[2])};});deltas.sort((a,b)=>b.speed-a.speed);return Math.abs(deltas[0].x)>.012?Math.sign(deltas[0].x):0;}
+export function reactionTurn(move,mirrored){return -(move.impactTurn||0)*(mirrored?-1:1);}
+export function directFall(p,ending,turn,envelope,mirror){if(!turn)return p;const yaw=ending.root[1]+ending.hips[1];const roll=ending.root[2]+ending.hips[2];const original=Math.abs(yaw)>.1?Math.sign(yaw):Math.abs(roll)>.1?-Math.sign(roll):0;const out=original&&original!==turn?mirror(p):p;if(Math.abs(yaw)<.1)out.root[1]+=turn*.65*envelope;if(Math.abs(roll)<.1)out.hips[2]-=turn*.32*envelope;return out;}

@@ -1,11 +1,11 @@
-import {assetBuffer} from './loading-progress.js?v=v0.1.15';
-import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.15';
+import {assetBuffer} from './loading-progress.js?v=v0.1.16';
+import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.16';
 import * as THREE from 'three';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.15';
-import {parseCharacter} from './character-loader.js?v=v0.1.15';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.15';
-import {createCharacterSkin} from './master-character.js?v=v0.1.15';
-import {createFighter} from './models.js?v=v0.1.15';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.16';
+import {parseCharacter} from './character-loader.js?v=v0.1.16';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.16';
+import {createCharacterSkin} from './master-character.js?v=v0.1.16';
+import {createFighter} from './models.js?v=v0.1.16';
 const ROOT='./';
 export async function loadRosterCharacter(id){
  const files=id==='master2'?['Master_2_MIXAMO.fbx','Master_2_txt.glb']:['Master_1_MIXAMO.fbx','Capoeira Game_Meshy V6_2026-10-29_02-01-17.glb'];

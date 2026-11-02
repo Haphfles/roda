@@ -1,4 +1,4 @@
-import {rigJoints} from './movement-data.mjs?v=v0.1.26';
+import {rigJoints} from './movement-data.mjs?v=v0.1.28';
 // Blend only at action boundaries: authored rotations and root travel stay intact.
 export class AnimationBlend {
  constructor(){this.reset();}

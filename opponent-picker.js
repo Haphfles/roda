@@ -1,6 +1,6 @@
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.26';
-import {readStats,statEffects} from './character-stats.mjs?v=v0.1.26';
-import {createFighter,poseFighter} from './models.js?v=v0.1.26';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.28';
+import {readStats,statEffects} from './character-stats.mjs?v=v0.1.28';
+import {createFighter,poseFighter} from './models.js?v=v0.1.28';
 export function opponentOptions(skins,player){return Object.keys(skins).filter(id=>id!==player);}
 export class OpponentPicker{
  constructor(setup,match,rig,carousel,worlds){

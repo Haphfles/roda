@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import {FBXLoader} from './FBXLoader.js?v=v0.1.26';
-import {clone} from './SkeletonUtils.js?v=v0.1.26';
+import {FBXLoader} from './FBXLoader.js?v=v0.1.28';
+import {clone} from './SkeletonUtils.js?v=v0.1.28';
 const V=()=>new THREE.Vector3(),Q=()=>new THREE.Quaternion(),down=new THREE.Vector3(0,-1,0);
 export async function loadMasterCharacter(){
- const manager=new THREE.LoadingManager();manager.setURLModifier(url=>{if(url.includes('Image_')||url.endsWith('/normal')){const name=url.split('/').at(-1);return './New_Characters/Master_1/textures/'+name+(name==='normal'?'.png':'.jpg');}return url;});
+ const manager=new THREE.LoadingManager();manager.setURLModifier(url=>{if(url.includes('Image_')||url.endsWith('/normal')){const name=url.split('/').at(-1);return './assets/character-sources/Master_1/textures/'+name+(name==='normal'?'.png':'.jpg');}return url;});
  const template=await new FBXLoader(manager).loadAsync('./Master_1_MIXAMO.fbx');
- const texture=await new THREE.TextureLoader().loadAsync('./New_Characters/Master_1/textures/Image_0.jpg');texture.colorSpace=THREE.SRGBColorSpace;
- const normal=await new THREE.TextureLoader().loadAsync('./New_Characters/Master_1/textures/normal.png');
+ const texture=await new THREE.TextureLoader().loadAsync('./assets/character-sources/Master_1/textures/Image_0.jpg');texture.colorSpace=THREE.SRGBColorSpace;
+ const normal=await new THREE.TextureLoader().loadAsync('./assets/character-sources/Master_1/textures/normal.png');
  const material=new THREE.MeshStandardMaterial({map:texture,normalMap:normal,roughness:.85,metalness:0,side:THREE.DoubleSide});template.traverse(o=>{if(o.isMesh)o.material=material;});
  return createCharacterSkin(template);
 }

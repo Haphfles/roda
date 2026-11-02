@@ -1,6 +1,6 @@
-import {AnimationMixer,LoopOnce,Vector3} from './three.module.js?v=v0.1.26';
-import {retargetFrame} from './motion-retarget.mjs?v=v0.1.26';
-import {validateMove} from './movement-data.mjs?v=v0.1.26';
+import {AnimationMixer,LoopOnce,Vector3} from './three.module.js?v=v0.1.28';
+import {retargetFrame} from './motion-retarget.mjs?v=v0.1.28';
+import {validateMove} from './movement-data.mjs?v=v0.1.28';
 // Our historical L/R joint labels are screen sides: L is -X, R is +X.
 // Mixamo uses anatomical sides: Left is +X when facing +Z.
 // Map sides here, including toes, so the inferred forward axis stays +Z.

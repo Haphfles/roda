@@ -1,26 +1,26 @@
-import {CommunityCharacters} from './community-characters.js?v=v0.1.26';
-import {SharedCharacters} from './shared-characters.js?v=v0.1.26';
-import {readStats} from './character-stats.mjs?v=v0.1.26';
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.26';
-import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.26';
-import {PhoneHost} from './phone-host.js?v=v0.1.26';
-import {OpponentPicker} from './opponent-picker.js?v=v0.1.26';
-import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.26';
-import {StudioFighters} from './studio-fighters.js?v=v0.1.26';
-import {CharacterCarousel} from './character-carousel.js?v=v0.1.26';
-import {loadingDone} from './loading-progress.js?v=v0.1.26';
-import {VoiceControls} from './voice-controls.js?v=v0.1.26';
-import {AnimationBlend} from './animation-blend.mjs?v=v0.1.26';
-import {MobileControls} from './mobile-controls.js?v=v0.1.26';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.26';
-import {availableMoves} from './movement-access.mjs?v=v0.1.26';
-import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.26';
+import {CommunityCharacters} from './community-characters.js?v=v0.1.28';
+import {SharedCharacters} from './shared-characters.js?v=v0.1.28';
+import {readStats} from './character-stats.mjs?v=v0.1.28';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.28';
+import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.28';
+import {PhoneHost} from './phone-host.js?v=v0.1.28';
+import {OpponentPicker} from './opponent-picker.js?v=v0.1.28';
+import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.28';
+import {StudioFighters} from './studio-fighters.js?v=v0.1.28';
+import {CharacterCarousel} from './character-carousel.js?v=v0.1.28';
+import {loadingDone} from './loading-progress.js?v=v0.1.28';
+import {VoiceControls} from './voice-controls.js?v=v0.1.28';
+import {AnimationBlend} from './animation-blend.mjs?v=v0.1.28';
+import {MobileControls} from './mobile-controls.js?v=v0.1.28';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.28';
+import {availableMoves} from './movement-access.mjs?v=v0.1.28';
+import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.28';
 import * as THREE from 'three';
-import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.26';
-import {loadCharacterAssignment} from './character-loader.js?v=v0.1.26';
-import {MovementStudio} from './studio.js?v=v0.1.26';
-import {Match,MOVES} from './game-core.mjs?v=v0.1.26';
-import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.26';
+import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.28';
+import {loadCharacterAssignment} from './character-loader.js?v=v0.1.28';
+import {MovementStudio} from './studio.js?v=v0.1.28';
+import {Match,MOVES} from './game-core.mjs?v=v0.1.28';
+import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.28';
 const $=id=>document.getElementById(id),keys=new Set(),match=new Match();
 let phone,phone2,modePicker,lastPhoneRestart=-Infinity,opponents,carousel,setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
 const mobile=new MobileControls(document.querySelector('.touch'),key=>{press(key);keys.delete(key);});
@@ -51,7 +51,7 @@ const trailMat=new THREE.LineBasicMaterial({color:'#fff1cb',transparent:true,opa
 function updateCamera(dt){if(match.state==='ready'){camera.position.set(-3.4,3.1,7.4);camera.lookAt(-.7,.85,0);return;}if(match.state!=='paused'){if(keys.has('q'))camTarget-=dt*.95;if(keys.has('e'))camTarget+=dt*.95;}camAngle=THREE.MathUtils.damp(camAngle,camTarget,5,dt);const aspect=$('viewport').clientWidth/$('viewport').clientHeight;const radius=aspect<.8?13.5:aspect<1.25?11.5:9.5;const mx=(match.p.x+match.b.x)*.20,mz=(match.p.z+match.b.z)*.20;camera.position.set(mx+Math.sin(camAngle)*radius,5.2,mz+Math.cos(camAngle)*radius);camera.lookAt(mx,.9,mz);const shake=impactShake.sample(match.state==='paused'?0:dt,reducedMotion.matches);camera.position.x+=shake[0];camera.position.y+=shake[1];camera.position.z+=shake[2];}
 function tick(now){requestAnimationFrame(tick);const dt=Math.min((now-last)/1000||0,.033);last=now;voice.update();phone?.update();phone2?.update();if(match.twoPlayer&&!match.practice&&match.state==='playing'&&(!phone?.connected||!phone2?.connected)){pause();note('Phone disconnected · reconnect, then tap Pause / resume.');}mobile.setActive(match.state==='playing'&&!studio?.active);if(studio?.active){studio.tick(dt);return;}const active=match.state!=='paused'&&match.state!=='over';if(active)clock+=dt;match.update(dt,input(),Math.random,phoneDirection(phone2?.vector));
  for(const ev of match.events.splice(0)){if(ev.kind==='end'){const w=match.winner;show(w==='you'?'Beautiful<br><em>game.</em>':w==='draw'?'Perfect<br><em>balance.</em>':'Find your<br><em>rhythm.</em>',`${match.twoPlayer?'Player 1':'You'} ${match.p.score} · ${match.twoPlayer?'Player 2':'Rival'} ${match.b.score}. ${w==='you'?(match.twoPlayer?'Player 1 wins!':'You win!'):w==='draw'?'A draw!':(match.twoPlayer?'Player 2 wins!':'Your rival wins.')} Step in for another round.`);$('eyebrow').textContent='THE CONVERSATION CONTINUES';tone(w==='you'?550:140,.4);}else{note(ev.text);if(ev.kind==='hit'){burst(ev.target);tone(95,.14,.12);const strength=impactStrength(ev.damage);if(strength){impactShake.hit(strength);phone?.impact(strength,ev.target===match.p);if(match.twoPlayer)phone2?.impact(strength,ev.target===match.b);if(navigator.vibrate&&!document.hidden)vibrateImpact(navigator,strength,ev.target===match.p);}}if(ev.kind==='dodge')tone(440,.12);}}
- const ready=match.state==='ready';opponents?.update(dt,ready);carousel?.update(dt,ready);rigP.root.visible=!ready;rigB.root.visible=!ready;poseFighter(rigP,ready?{...match.p,x:1.6,z:0,heading:.15,action:'idle'}:match.p,clock);poseFighter(rigB,match.b,clock+.7);studio?.pose(rigP,ready?{...match.p,heading:.15,action:'idle'}:match.p,clock);studio?.pose(rigB,match.b,clock+.7);for(const [i,rig,f] of [[0,rigP,match.p],[1,rigB,match.b]])blends[i].update(rig,f,active?dt:0,MOVES[f.action],1.25*moveEffects(f.stats,MOVES[f.action]||{}).speed);for(const s of world.spectators){poseFighter(s.rig,s.f,clock+s.f.x);s.rig.arms.l.upper.rotation.set(-.8,0,-.45);s.rig.arms.r.upper.rotation.set(-.8,0,.45);s.rig.arms.l.lower.rotation.set(-1,0,Math.sin(clock*5)*.2-.5);s.rig.arms.r.lower.rotation.set(-1,0,-Math.sin(clock*5)*.2+.5);}
+ const ready=match.state==='ready';rigP.root.visible=!ready;rigB.root.visible=!ready;opponents?.update(dt,ready);carousel?.update(dt,ready);rigP.root.visible=!ready;rigB.root.visible=!ready;poseFighter(rigP,ready?{...match.p,x:1.6,z:0,heading:.15,action:'idle'}:match.p,clock);poseFighter(rigB,match.b,clock+.7);studio?.pose(rigP,ready?{...match.p,heading:.15,action:'idle'}:match.p,clock);studio?.pose(rigB,match.b,clock+.7);for(const [i,rig,f] of [[0,rigP,match.p],[1,rigB,match.b]])blends[i].update(rig,f,active?dt:0,MOVES[f.action],1.25*moveEffects(f.stats,MOVES[f.action]||{}).speed);for(const s of world.spectators){poseFighter(s.rig,s.f,clock+s.f.x);s.rig.arms.l.upper.rotation.set(-.8,0,-.45);s.rig.arms.r.upper.rotation.set(-.8,0,.45);s.rig.arms.l.lower.rotation.set(-1,0,Math.sin(clock*5)*.2-.5);s.rig.arms.r.lower.rotation.set(-1,0,-Math.sin(clock*5)*.2+.5);}
  for(const [rig,f]of [[rigP,match.p],[rigB,match.b]])if(rig.trackedFeet)anchorTrackedFeet(rig,f.stats?.flexibility);rigP.root.position.y=rigP.trackedFeet?0:match.p.travelY||0;rigB.root.position.y=rigB.trackedFeet?0:match.b.travelY||0;rigP.updateSkin?.();rigB.updateSkin?.();for(const s of world.spectators)s.rig.updateSkin?.();
  if(active){for(const p of particles){p.life-=dt;p.v.y-=dt*4;p.mesh.position.addScaledVector(p.v,dt);p.mesh.material.opacity=Math.max(0,p.life/p.max);}particles=particles.filter(p=>{if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();return false}return true});for(const p of trail)p.life-=dt;trail=trail.filter(p=>p.life>0);scene.updateMatrixWorld(true);addTrail(rigP,match.p);addTrail(rigB,match.b);trailLine.geometry.dispose();trailLine.geometry=new THREE.BufferGeometry().setFromPoints(trail.map(t=>t.p));trailLine.visible=trail.length>1;}
  if(match.state==='playing'){beat+=dt;if(beat>.45){beat=0;tone(Math.floor(clock/.45)%4===0?160:270,.13,.035);}if(clock>calloutUntil)$('callout').textContent=match.practice?'FREE PRACTICE · FOLLOW YOUR MOVEMENT KEYS':'MOVE WITH INTENTION';}updateHud();updateCamera(dt);updateMoveHints();renderer.render(scene,camera);}

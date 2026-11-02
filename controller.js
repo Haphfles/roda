@@ -1,6 +1,6 @@
-import {vibrateImpact} from './impact-feedback.mjs?v=v0.1.26';
-import {PhoneChannel,phoneConfig,randomPair,validPair} from './phone-channel.mjs?v=v0.1.26';
-import {MobileControls} from './mobile-controls.js?v=v0.1.26';
+import {vibrateImpact} from './impact-feedback.mjs?v=v0.1.28';
+import {PhoneChannel,phoneConfig,randomPair,validPair} from './phone-channel.mjs?v=v0.1.28';
+import {MobileControls} from './mobile-controls.js?v=v0.1.28';
 let lastImpact=0;
 const $=id=>document.getElementById(id),token=location.hash.slice(1);let channel,client=randomPair(),seq=0,lastState=0,active=false,rows=[],signature='',lastSent=0,lastVector='',paired=false,connecting=false;
 try{const saved=sessionStorage.getItem('roda-pad-'+token);if(validPair(saved))client=saved;else sessionStorage.setItem('roda-pad-'+token,client);}catch{}

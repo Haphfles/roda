@@ -1,10 +1,17 @@
-RODA v0.1.29 — direct golpe key entry
+# RODA v0.1.30
 
-Upload the green-tagged files INSIDE this folder to the repository root, replacing the matching files. No models need re-uploading. This includes earlier updates since v0.1.11.
+Optimized playable game with Studio and two-phone controls.
 
-Studio > select character > Edit beside a golpe > click the Key field and press/type a letter or number > Save & use.
-Backspace/Delete clears the assignment. Keys are specific to each character. A key already assigned to another golpe is rejected with the movement name; clear its old assignment first. W A S D Q E P R and Space remain reserved for movement, camera, pause, restart and dodge. Ginga and Fall are automatic animation roles and do not have attack keys.
+Upload the green-tagged files in this folder to the root of Haphfles/roda, replacing matching names. Include all five optimized GLB files. Do not upload the parent Game folder or the testing/source folders. For a clean repository, upload all contents of this release folder, including .nojekyll.
 
-Publish character shares the saved assignments with other players. Custom keys are retained in movement exports, shared libraries, on-screen hints and phone buttons. No new Supabase SQL is needed.
+Changes: one main game renderer shared by selection and gameplay; no 3D thumbnail renderer; smaller 1024px release textures and 512px mobile GPU textures; texture-only material donors; lighter mobile shadows and resolution; no unused default crowd clones. Original assets remain unchanged outside this release.
 
-Validation: 21 test suites passed. Additional checks verified letter/digit assignments survive validation, publish and shared reload, reserved keys are rejected, and all packaged module imports/syntax pass.
+Shared characters are downloaded when selected, rather than blocking startup. Loaded fighters are reused around the roda. Select a cloud fighter using the arrows, Studio fighter buttons, or opponent picker.
+
+Two phones: select “Two players · two phones”. Pair phone one through “Player 1 phone” and phone two through “Player 2 phone”, using their different QR codes. Close the pairing panels, then start. Keep both controller pages visible. Attacks and hit feedback now use acknowledgements/retries; joystick updates have independent sequencing.
+
+Use Test vibration on the controller. Vibration depends on browser/device support and system settings. Unsupported browsers receive a visual hit flash. Real physical phones still need a hands-on check.
+
+Validation: 21 automated test files pass; desktop and mobile-emulated Chrome startup and start/home transitions pass; both Supabase controller channels worked simultaneously with 200 input messages, 20 attacks, and 20 returned impact messages. Emulation is not a physical-phone performance measurement.
+
+No new Supabase SQL required. Open https://haphfles.github.io/roda/ after GitHub Pages finishes deploying. Reload the game and open fresh phone pairing links.

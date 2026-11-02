@@ -19,3 +19,14 @@ export function transferCharacterMaterials(target,source,{flipY=true}={}){
  for(const [mesh,material]of changes)mesh.material=material;
  return changes.length;
 }
+
+// Bound GPU memory for uploaded/cloud models too. Shared images are resized only once.
+const resizedImages=new WeakMap();
+export function limitTextureSize(root,limit=typeof matchMedia==='function'&&matchMedia('(pointer:coarse)').matches?512:1024){
+ if(typeof document==='undefined')return;
+ root.traverse(o=>{if(!o.isMesh)return;for(const m of Array.isArray(o.material)?o.material:[o.material])for(const texture of Object.values(m||{})){
+  const image=texture?.isTexture&&texture.image;if(!image||!image.width||Math.max(image.width,image.height)<=limit)continue;
+  let canvas=resizedImages.get(image);if(!canvas){canvas=document.createElement('canvas');const scale=limit/Math.max(image.width,image.height);canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);resizedImages.set(image,canvas);}
+  texture.image=canvas;texture.needsUpdate=true;
+ }});
+}

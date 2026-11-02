@@ -1,9 +1,9 @@
-import {updateComputer} from './computer-player.mjs?v=v0.1.29';
-import {physiqueEffects} from './character-physique.mjs?v=v0.1.29';
-import {reactionTurn} from './hit-direction.mjs?v=v0.1.29';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.29';
-import {canUseMove} from './movement-access.mjs?v=v0.1.29';
-import {sampleTravel} from './root-motion.mjs?v=v0.1.29';
+import {updateComputer} from './computer-player.mjs?v=v0.1.30';
+import {physiqueEffects} from './character-physique.mjs?v=v0.1.30';
+import {reactionTurn} from './hit-direction.mjs?v=v0.1.30';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.30';
+import {canUseMove} from './movement-access.mjs?v=v0.1.30';
+import {sampleTravel} from './root-motion.mjs?v=v0.1.30';
 export const KNOCKDOWN={enabled:true,duration:.97,fall:.5,rise:.62,recovery:.35,grace:.65,heavyDamage:18,comboWindow:2.5};
 export const MOVES={kick:{id:'kick',name:'MEIA-LUA',kind:'attack',duration:.66,contact:.29,range:2.05,cost:14,damage:10},spin:{id:'spin',impactTurn:1,name:'ARMADA',kind:'attack',duration:1.16,contact:.63,range:2.5,cost:28,damage:19},dodge:{id:'dodge',name:'ESQUIVA',kind:'dodge',duration:.76,cost:11}};
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));

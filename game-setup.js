@@ -1,12 +1,12 @@
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.29';
-import {assetBuffer} from './loading-progress.js?v=v0.1.29';
-import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.29';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.30';
+import {assetBuffer} from './loading-progress.js?v=v0.1.30';
+import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.30';
 import * as THREE from 'three';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.29';
-import {parseCharacter} from './character-loader.js?v=v0.1.29';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.29';
-import {createCharacterSkin} from './master-character.js?v=v0.1.29';
-import {createFighter} from './models.js?v=v0.1.29';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.30';
+import {parseCharacter} from './character-loader.js?v=v0.1.30';
+import {transferCharacterMaterials,limitTextureSize} from './character-materials.mjs?v=v0.1.30';
+import {createCharacterSkin} from './master-character.js?v=v0.1.30';
+import {createFighter} from './models.js?v=v0.1.30';
 const ROOT='./';
 export async function loadRosterCharacter(id){
  const files=id==='master2'?['Master_2_MIXAMO.fbx','Master_2_txt.glb']:['Master_1_MIXAMO.fbx','Capoeira Game_Meshy V6_2026-10-29_02-01-17.glb'];
@@ -14,7 +14,7 @@ export async function loadRosterCharacter(id){
  transferCharacterMaterials(rig.root,texture.root,{flipY:true});return createCharacterSkin(rig.root);
 }
 export async function loadQuilombo(){
- const {scene:source}=await new GLTFLoader().parseAsync(await assetBuffer('./1_Quilombo_Meshy.glb'),'');source.updateMatrixWorld(true);
+ const {scene:source}=await new GLTFLoader().parseAsync(await assetBuffer('./1_Quilombo_Meshy.glb'),'');limitTextureSize(source);source.updateMatrixWorld(true);
  // Human-scale doorway: shrink the complete set uniformly, including its clearing.
  const origin=new THREE.Vector3(0,0,.48),ray=new THREE.Raycaster(new THREE.Vector3(0,2,.48),new THREE.Vector3(0,-1,0));const hit=ray.intersectObject(source,true)[0];if(!hit)throw Error('Could not locate the Quilombo clearing');origin.y=hit.point.y;
  const group=new THREE.Group();group.name='Quilombo';
@@ -44,8 +44,5 @@ export class GameSetup{
  saveStats(stats){setSharedStats(this.selection.character,stats);try{localStorage.setItem('roda-build-'+this.selection.character,JSON.stringify(stats));}catch{}this.refreshStats();}
  refreshStats(){const stats=readStats(this.selection.character);this.statsPanel.querySelector('.flexibility-setting input').value=stats.flexibility??50;this.statsPanel.querySelector('.flexibility-setting output').textContent=(stats.flexibility??50)+'%';const remaining=CREDIT_BUDGET-spentCredits(stats);this.statsPanel.querySelector('.credit-count').textContent=remaining+' credits left';for(const key of STAT_KEYS){this.statsPanel.querySelector(`[data-value="${key}"]`).textContent=stats[key];for(const b of this.statsPanel.querySelectorAll(`[data-stat="${key}"]`))b.disabled=Number(b.dataset.delta)<0?stats[key]===0:stats[key]===6||remaining===0;}this.onStats?.(stats,statEffects(stats));}
  refresh(){this.refreshStats();for(const button of this.host.querySelectorAll('[data-character]'))button.setAttribute('aria-pressed',String(button.dataset.character===this.selection.character));for(const button of this.host.querySelectorAll('[data-scenario]'))button.setAttribute('aria-pressed',String(button.dataset.scenario===this.selection.scenario));document.getElementById('setup-summary').textContent=(this.skins[this.selection.character]?.displayName||(this.selection.character==='master1'?'Master_1':'Master_2'))+' / '+(this.selection.scenario==='courtyard'?'Salvador':'Quilombo');}
- makeThumbnails(){const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.setSize(280,230);const scene=new THREE.Scene();scene.background=new THREE.Color('#31473a');scene.add(new THREE.HemisphereLight('#fff6e4','#829886',2.5));const light=new THREE.DirectionalLight('#fff2db',3);light.position.set(3,5,4);scene.add(light);const camera=new THREE.PerspectiveCamera(30,280/230,.01,100);camera.position.set(0,1.35,3.8);camera.lookAt(0,1.1,0);
- for(const id of Object.keys(this.skins)){const rig=createFighter();this.skins[id](rig);scaleCharacter(rig,id);rig.hips.position.y=.925;rig.updateSkin();scene.add(rig.root);renderer.render(scene,camera);this.host.querySelector('[data-character="'+id+'"] img').src=renderer.domElement.toDataURL();scene.remove(rig.root);rig.root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});}
- renderer.setSize(320,160);camera.aspect=2;camera.fov=48;camera.updateProjectionMatrix();const visibility=new Map(Object.values(this.worlds).map(w=>[w.world,w.world.visible]));for(const [id,w]of Object.entries(this.worlds)){for(const item of Object.values(this.worlds))item.world.visible=item===w;camera.position.set(id==='quilombo'?7:10,id==='quilombo'?8:13,id==='quilombo'?10:17);camera.lookAt(0,1,-2);renderer.render(this.scene,camera);this.host.querySelector('[data-scenario="'+id+'"] img').src=renderer.domElement.toDataURL();}for(const [obj,visible]of visibility)obj.visible=visible;renderer.dispose();
- }
+ makeThumbnails(){for(const img of this.host.querySelectorAll('img'))img.remove();}
 }

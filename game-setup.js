@@ -1,11 +1,11 @@
-import {assetBuffer} from './loading-progress.js?v=v0.1.23';
-import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.23';
+import {assetBuffer} from './loading-progress.js?v=v0.1.24';
+import {STAT_KEYS,CREDIT_BUDGET,DEFAULT_STATS,readStats,statEffects,setSharedStats,spentCredits} from './character-stats.mjs?v=v0.1.24';
 import * as THREE from 'three';
-import {GLTFLoader} from './GLTFLoader.js?v=v0.1.23';
-import {parseCharacter} from './character-loader.js?v=v0.1.23';
-import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.23';
-import {createCharacterSkin} from './master-character.js?v=v0.1.23';
-import {createFighter} from './models.js?v=v0.1.23';
+import {GLTFLoader} from './GLTFLoader.js?v=v0.1.24';
+import {parseCharacter} from './character-loader.js?v=v0.1.24';
+import {transferCharacterMaterials} from './character-materials.mjs?v=v0.1.24';
+import {createCharacterSkin} from './master-character.js?v=v0.1.24';
+import {createFighter} from './models.js?v=v0.1.24';
 const ROOT='./';
 export async function loadRosterCharacter(id){
  const files=id==='master2'?['Master_2_MIXAMO.fbx','Master_2_txt.glb']:['Master_1_MIXAMO.fbx','Capoeira Game_Meshy V6_2026-10-29_02-01-17.glb'];
@@ -38,9 +38,10 @@ export class GameSetup{
  mountStats(){const panel=document.createElement('details');panel.className='character-build';panel.innerHTML='<summary>Customize fighter <span class="credit-count"></span></summary><p>12 credits · maximum 6 per stat. Saved on this device.</p><div class="stat-rows"></div><button type="button" class="reset-build">Reset balanced build</button>';
  const descriptions={size:'Height and reach',kicks:'Attack speed',power:'Damage dealt',defense:'Damage resistance'};
  for(const key of STAT_KEYS){const row=document.createElement('div');row.className='stat-row';row.innerHTML=`<label>${key[0].toUpperCase()+key.slice(1)}<small>${descriptions[key]}</small></label><button type="button" data-stat="${key}" data-delta="-1" aria-label="Decrease ${key}">−</button><output data-value="${key}"></output><button type="button" data-stat="${key}" data-delta="1" aria-label="Increase ${key}">+</button>`;panel.querySelector('.stat-rows').append(row);}
+ const flex=document.createElement('label');flex.className='flexibility-setting';flex.innerHTML='Flexibility <output></output><input type="range" min="0" max="100" step="1" aria-label="Character flexibility"><small>Tracked movement range · separate from combat credits</small>';panel.querySelector('.stat-rows').after(flex);flex.querySelector('input').oninput=e=>this.saveStats({...readStats(this.selection.character),flexibility:Number(e.target.value)});
  panel.addEventListener('click',e=>{const b=e.target.closest('[data-stat]');if(!b)return;const stats=readStats(this.selection.character),key=b.dataset.stat,next=stats[key]+Number(b.dataset.delta);if(next<0||next>6||spentCredits(stats)+Number(b.dataset.delta)>CREDIT_BUDGET)return;stats[key]=next;this.saveStats(stats);});panel.querySelector('.reset-build').onclick=()=>this.saveStats({...DEFAULT_STATS});this.host.querySelector('.scenario-options').before(panel);this.statsPanel=panel;}
  saveStats(stats){setSharedStats(this.selection.character,stats);try{localStorage.setItem('roda-build-'+this.selection.character,JSON.stringify(stats));}catch{}this.refreshStats();}
- refreshStats(){const stats=readStats(this.selection.character),remaining=CREDIT_BUDGET-spentCredits(stats);this.statsPanel.querySelector('.credit-count').textContent=remaining+' credits left';for(const key of STAT_KEYS){this.statsPanel.querySelector(`[data-value="${key}"]`).textContent=stats[key];for(const b of this.statsPanel.querySelectorAll(`[data-stat="${key}"]`))b.disabled=Number(b.dataset.delta)<0?stats[key]===0:stats[key]===6||remaining===0;}this.onStats?.(stats,statEffects(stats));}
+ refreshStats(){const stats=readStats(this.selection.character);this.statsPanel.querySelector('.flexibility-setting input').value=stats.flexibility??50;this.statsPanel.querySelector('.flexibility-setting output').textContent=(stats.flexibility??50)+'%';const remaining=CREDIT_BUDGET-spentCredits(stats);this.statsPanel.querySelector('.credit-count').textContent=remaining+' credits left';for(const key of STAT_KEYS){this.statsPanel.querySelector(`[data-value="${key}"]`).textContent=stats[key];for(const b of this.statsPanel.querySelectorAll(`[data-stat="${key}"]`))b.disabled=Number(b.dataset.delta)<0?stats[key]===0:stats[key]===6||remaining===0;}this.onStats?.(stats,statEffects(stats));}
  refresh(){this.refreshStats();for(const button of this.host.querySelectorAll('[data-character]'))button.setAttribute('aria-pressed',String(button.dataset.character===this.selection.character));for(const button of this.host.querySelectorAll('[data-scenario]'))button.setAttribute('aria-pressed',String(button.dataset.scenario===this.selection.scenario));document.getElementById('setup-summary').textContent=(this.skins[this.selection.character]?.displayName||(this.selection.character==='master1'?'Master_1':'Master_2'))+' / '+(this.selection.scenario==='courtyard'?'Salvador':'Quilombo');}
  makeThumbnails(){const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.setSize(280,230);const scene=new THREE.Scene();scene.background=new THREE.Color('#31473a');scene.add(new THREE.HemisphereLight('#fff6e4','#829886',2.5));const light=new THREE.DirectionalLight('#fff2db',3);light.position.set(3,5,4);scene.add(light);const camera=new THREE.PerspectiveCamera(30,280/230,.01,100);camera.position.set(0,1.35,3.8);camera.lookAt(0,1.1,0);
  for(const id of Object.keys(this.skins)){const rig=createFighter();this.skins[id](rig);rig.hips.position.y=.925;rig.updateSkin();scene.add(rig.root);renderer.render(scene,camera);this.host.querySelector('[data-character="'+id+'"] img').src=renderer.domElement.toDataURL();scene.remove(rig.root);rig.root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});}

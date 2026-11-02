@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import {FBXLoader} from './FBXLoader.js?v=v0.1.25';
-import {clone} from './SkeletonUtils.js?v=v0.1.25';
+import {FBXLoader} from './FBXLoader.js?v=v0.1.26';
+import {clone} from './SkeletonUtils.js?v=v0.1.26';
 const V=()=>new THREE.Vector3(),Q=()=>new THREE.Quaternion(),down=new THREE.Vector3(0,-1,0);
 export async function loadMasterCharacter(){
  const manager=new THREE.LoadingManager();manager.setURLModifier(url=>{if(url.includes('Image_')||url.endsWith('/normal')){const name=url.split('/').at(-1);return './New_Characters/Master_1/textures/'+name+(name==='normal'?'.png':'.jpg');}return url;});
@@ -48,6 +48,6 @@ export function createCharacterSkin(source,{scale:adjustment=1,facing=0}={}){
    for(const entry of mapping){const desired=entry.control.getWorldQuaternion(Q()).multiply(entry.rest);entry.bone.quaternion.copy(entry.bone.parent.getWorldQuaternion(Q()).invert().multiply(desired));if(entry.bone===hip){const pos=rig.hips.getWorldPosition(V());pos.y+=floorOffset*rig.root.getWorldScale(V()).y;entry.bone.position.copy(entry.bone.parent.worldToLocal(pos));}entry.bone.updateWorldMatrix(false,true);}
   };
   // Calibrate the skin's sole against the floor in a neutral stance.
-  const previous=rig.hips.position.y;rig.hips.position.y=.925;rig.updateSkin();model.traverse(o=>{if(o.isSkinnedMesh)o.computeBoundingBox();});floorOffset=-new THREE.Box3().setFromObject(model).min.y;rig.hips.position.y=height;controls.forEach((o,i)=>o.quaternion.copy(rotations[i]));rig.root.position.copy(rootPosition);rig.root.scale.copy(rootScale);rig.updateSkin();
+  const previous=rig.hips.position.y;rig.hips.position.y=.925;rig.updateSkin();model.traverse(o=>{if(o.isSkinnedMesh)o.computeBoundingBox();});const neutralBounds=new THREE.Box3().setFromObject(model);rig.characterHeight=neutralBounds.max.y-neutralBounds.min.y;floorOffset=-neutralBounds.min.y;rig.hips.position.y=height;controls.forEach((o,i)=>o.quaternion.copy(rotations[i]));rig.root.position.copy(rootPosition);rig.root.scale.copy(rootScale);rig.updateSkin();
  };
 }

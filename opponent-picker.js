@@ -1,5 +1,6 @@
-import {readStats,statEffects} from './character-stats.mjs?v=v0.1.25';
-import {createFighter,poseFighter} from './models.js?v=v0.1.25';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.26';
+import {readStats,statEffects} from './character-stats.mjs?v=v0.1.26';
+import {createFighter,poseFighter} from './models.js?v=v0.1.26';
 export function opponentOptions(skins,player){return Object.keys(skins).filter(id=>id!==player);}
 export class OpponentPicker{
  constructor(setup,match,rig,carousel,worlds){
@@ -16,7 +17,7 @@ export class OpponentPicker{
   if(!ids.includes(this.selected))this.selected=ids[0];
   if(signature!==this.last){this.select.replaceChildren();for(const id of ids){const option=document.createElement('option');option.value=id;option.textContent=this.setup.skins[id].displayName||id;this.select.append(option);}this.last=signature;force=true;}
   this.select.value=this.selected||'';this.select.disabled=!ids.length;
-  if(force&&this.selected){if(this.match.b.characterId!==this.selected||this.loaded!==this.setup.skins[this.selected]){this.setup.skins[this.selected](this.rig);this.loaded=this.setup.skins[this.selected];}this.match.b.characterId=this.selected;this.match.b.stats=readStats(this.selected);this.rig.root.scale.setScalar((this.setup.selection.scenario==='quilombo'?1.3:1)*statEffects(this.match.b.stats).size);try{localStorage.setItem('roda-opponent-v1',this.selected);}catch{}}
+  if(force&&this.selected){if(this.match.b.characterId!==this.selected||this.loaded!==this.setup.skins[this.selected]){this.setup.skins[this.selected](this.rig);this.loaded=this.setup.skins[this.selected];}this.match.b.characterId=this.selected;this.match.b.stats=readStats(this.selected);scaleCharacter(this.rig,this.selected,this.setup.selection.scenario==='quilombo'?1.3:1);try{localStorage.setItem('roda-opponent-v1',this.selected);}catch{}}
  }
  update(dt,ready){
   this.sync();this.clock+=dt;
@@ -26,7 +27,7 @@ export class OpponentPicker{
   for(const [id,rig]of this.carousel.rigs)if(!watchers.includes(id))rig.root.visible=false;
   watchers.forEach((id,i)=>{let rig=this.carousel.rigs.get(id);if(!rig){rig=createFighter();this.setup.skins[id](rig);this.carousel.rigs.set(id,rig);}if(rig.root.parent!==this.setup.scene)this.setup.scene.add(rig.root);rig.root.visible=true;
    const angle=watchers.length===1?0:-Math.PI*.65+i*Math.PI*1.3/(watchers.length-1),x=Math.sin(angle)*radius,z=-Math.cos(angle)*radius;
-   poseFighter(rig,{x,z,heading:Math.atan2(-x,-z),action:'idle',t:0},this.clock+i);rig.root.scale.setScalar((this.setup.selection.scenario==='quilombo'?1.3:1)*statEffects(readStats(id)).size);
+   poseFighter(rig,{x,z,heading:Math.atan2(-x,-z),action:'idle',t:0},this.clock+i);scaleCharacter(rig,id,this.setup.selection.scenario==='quilombo'?1.3:1);
    rig.arms.l.upper.rotation.set(-.8,0,-.45);rig.arms.r.upper.rotation.set(-.8,0,.45);rig.arms.l.lower.rotation.set(-1,0,Math.sin(this.clock*4)*.2-.5);rig.arms.r.lower.rotation.set(-1,0,-Math.sin(this.clock*4)*.2+.5);rig.updateSkin?.();
   });
  }

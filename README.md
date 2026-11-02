@@ -1,17 +1,19 @@
-RODA v0.1.25 — upload guide
+RODA v0.1.26 — upload guide
 
-Upload the green-tagged files INSIDE v0.1.25 to the root of Haphfles/roda, replacing files with the same names. Do not upload the enclosing folder. The green selection includes cumulative updates since v0.1.11, so it also includes the previous phone-controller and Studio updates. No character models need uploading again for these changes.
+Upload every GREEN-tagged file INSIDE this folder to the root of Haphfles/roda, replacing the same filenames. Do not upload the enclosing folder. Tags include cumulative changes since v0.1.11, including two-phone multiplayer. No character models need re-uploading.
 
-After GitHub Pages finishes deploying, reload the game (hard refresh if needed).
+Wait for GitHub Pages deployment, then hard-refresh the game and reopen phone controller links from fresh QR codes.
 
-Changes:
-- Create a movement removed from the opening screen; creation remains in Studio.
-- Rounds last up to 120 seconds; each fighter has 200 health. Golpe damage and per-character credits remain unchanged.
-- Phones can start/restart and pause/resume the game.
-- Game mode: Two players / two phones. Choose your fighter and Player 2 fighter. Open Player 1 phone and scan with the first phone; tap Connect. Close the pairing panel, then do the same under Player 2 phone with the other phone. Close the second panel. Tap Start game on either phone, or Enter the roda on the computer.
-- Both players use the SAME computer game screen; each phone has its own joystick and character-specific golpes. Both phones and the computer need internet. Keep the game tab visible. Losing a phone connection pauses the match; reconnect and tap Pause / resume.
-- For solo play, choose Solo / computer opponent and pair only Player 1 phone if desired.
+WHAT CHANGED
+- CPU closes distance, follows moving opponents, mixes available kicks and reacts to attacks with dodges. It observes each character's move permissions and energy. Two-player mode still has no AI.
+- Admin > sign in > Character measurements: select a fighter, enter height in cm and weight in kg, preview, then Save measurements for everyone. For a new fighter, submit the model first, set measurements while pending, then approve it. Published measurements reach players on reload.
+- Height uniformly scales the actual model and changes reach. Feet remain grounded. Weight affects impact, not body width. Defaults: 175 cm / 75 kg; allowed height 120–220 cm and weight 35–160 kg. The Quilombo scene retains its existing 1.3 visual scale.
+- The player-editable Size credit stat is removed. Previously allocated size points are released into the same 12-credit budget. Speed, power, defense and per-golpe allocations remain editable.
+- Damage = base damage × power credits × bounded square-root weight factor × bounded attack-speed factor × target defense. Default 75 kg and balanced speed/power preserve base damage. Attack speed still changes animation timing.
+- Hits dealing at least 18 damage produce a short fading screen shake. Reduced-motion preferences disable shake. Paired phones receive an impact pulse (stronger for the receiving fighter); vibration only works in supported browsers/devices and may be blocked by device settings. No vibration hardware was tested.
 
-Validation: all 18 automated test suites pass; 57 packaged modules pass syntax/import checks; opening UI, two-player selection, second pairing panel and 120-second solo gameplay checked in-browser. Two physical phones have not yet been tested together.
+SUPABASE
+Run Game/Supabase/07-character-physique.sql once in the SQL Editor if not already applied. Do NOT upload SQL files to GitHub. The measurement table was confirmed accessible and anonymous writes were denied during verification. Measurements are stored separately from owner-editable settings; the save function requires the existing admin role. Existing character-owner sign-ins cannot save these measurements.
 
-No new Supabase SQL is needed.
+VERIFICATION
+20 automated test suites passed, including pursuit/variety/dodge, move restrictions, two-player isolation, weight/speed damage, real Master_1 mesh heights at 120/175/220 cm with grounded feet, and safe vibration fallback. 61 packaged modules passed syntax/import checks. Browser startup and a complete CPU match finished without JavaScript errors; measurement fields were hidden before admin sign-in. Authenticated admin save and physical phone vibration still need device/account testing.

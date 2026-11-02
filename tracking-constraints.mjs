@@ -1,5 +1,5 @@
-import {Vector3,Quaternion,Euler} from './three.module.js?v=v0.1.25';
-import {solveIK,chain} from './studio-ik.mjs?v=v0.1.25';
+import {Vector3,Quaternion,Euler} from './three.module.js?v=v0.1.26';
+import {solveIK,chain} from './studio-ik.mjs?v=v0.1.26';
 const rad=Math.PI/180,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function flexibilityValue(value){return Number.isFinite(Number(value))?clamp(Number(value),0,100):50;}
 // Local joint limits, not a dynamics or collision simulation. Root flips remain unrestricted in free mode.

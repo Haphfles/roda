@@ -1,9 +1,10 @@
-RODA v0.1.28
+RODA v0.1.29 — direct golpe key entry
 
-Upload the green-tagged files inside this folder to the root of Haphfles/roda, replacing matching filenames. No model files need re-uploading. Tags include cumulative updates since v0.1.11.
+Upload the green-tagged files INSIDE this folder to the repository root, replacing the matching files. No models need re-uploading. This includes earlier updates since v0.1.11.
 
-Opening screen: fighters now stand in the selected scenario in bowling-pin rows. Use the previous/next arrows or swipe to select a fighter. The selected fighter rises slightly on a small platform. Unselected fighters remain at ground level. The same models become spectators during gameplay.
+Studio > select character > Edit beside a golpe > click the Key field and press/type a letter or number > Save & use.
+Backspace/Delete clears the assignment. Keys are specific to each character. A key already assigned to another golpe is rejected with the movement name; clear its old assignment first. W A S D Q E P R and Space remain reserved for movement, camera, pause, restart and dodge. Ginga and Fall are automatic animation roles and do not have attack keys.
 
-The working project is organised into src, assets, tools, tests, docs and archive. Start Game.command and Build Upload Version.command are at the Game folder root. Restart any old local server after moving the files. Upload only the contents of a numbered Releases folder, never the working project or archive.
+Publish character shares the saved assignments with other players. Custom keys are retained in movement exports, shared libraries, on-screen hints and phone buttons. No new Supabase SQL is needed.
 
-All original model assets and saved movement libraries were preserved during reorganisation. 21 automated test suites and packaged module syntax/import checks passed.
+Validation: 21 test suites passed. Additional checks verified letter/digit assignments survive validation, publish and shared reload, reserved keys are rejected, and all packaged module imports/syntax pass.

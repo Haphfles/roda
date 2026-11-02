@@ -1,26 +1,26 @@
-import {CommunityCharacters} from './community-characters.js?v=v0.1.28';
-import {SharedCharacters} from './shared-characters.js?v=v0.1.28';
-import {readStats} from './character-stats.mjs?v=v0.1.28';
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.28';
-import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.28';
-import {PhoneHost} from './phone-host.js?v=v0.1.28';
-import {OpponentPicker} from './opponent-picker.js?v=v0.1.28';
-import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.28';
-import {StudioFighters} from './studio-fighters.js?v=v0.1.28';
-import {CharacterCarousel} from './character-carousel.js?v=v0.1.28';
-import {loadingDone} from './loading-progress.js?v=v0.1.28';
-import {VoiceControls} from './voice-controls.js?v=v0.1.28';
-import {AnimationBlend} from './animation-blend.mjs?v=v0.1.28';
-import {MobileControls} from './mobile-controls.js?v=v0.1.28';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.28';
-import {availableMoves} from './movement-access.mjs?v=v0.1.28';
-import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.28';
+import {CommunityCharacters} from './community-characters.js?v=v0.1.29';
+import {SharedCharacters} from './shared-characters.js?v=v0.1.29';
+import {readStats} from './character-stats.mjs?v=v0.1.29';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.29';
+import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.29';
+import {PhoneHost} from './phone-host.js?v=v0.1.29';
+import {OpponentPicker} from './opponent-picker.js?v=v0.1.29';
+import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.29';
+import {StudioFighters} from './studio-fighters.js?v=v0.1.29';
+import {CharacterCarousel} from './character-carousel.js?v=v0.1.29';
+import {loadingDone} from './loading-progress.js?v=v0.1.29';
+import {VoiceControls} from './voice-controls.js?v=v0.1.29';
+import {AnimationBlend} from './animation-blend.mjs?v=v0.1.29';
+import {MobileControls} from './mobile-controls.js?v=v0.1.29';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.29';
+import {availableMoves} from './movement-access.mjs?v=v0.1.29';
+import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.29';
 import * as THREE from 'three';
-import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.28';
-import {loadCharacterAssignment} from './character-loader.js?v=v0.1.28';
-import {MovementStudio} from './studio.js?v=v0.1.28';
-import {Match,MOVES} from './game-core.mjs?v=v0.1.28';
-import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.28';
+import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.29';
+import {loadCharacterAssignment} from './character-loader.js?v=v0.1.29';
+import {MovementStudio} from './studio.js?v=v0.1.29';
+import {Match,MOVES} from './game-core.mjs?v=v0.1.29';
+import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.29';
 const $=id=>document.getElementById(id),keys=new Set(),match=new Match();
 let phone,phone2,modePicker,lastPhoneRestart=-Infinity,opponents,carousel,setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
 const mobile=new MobileControls(document.querySelector('.touch'),key=>{press(key);keys.delete(key);});
@@ -80,7 +80,7 @@ try{
  window.ginga={match,scene,renderer,rigP,rigB,get ready(){return isReady},get cameraAngle(){return camAngle}};
 }catch(error){console.error(error);$('error').hidden=false;$('error').innerHTML='<h2>The 3D renderer couldn’t start.</h2><p>Check your connection and reload in a browser with WebGL 2 enabled.</p>';const detail=document.createElement('p');detail.textContent='Details: '+error.message;$('error').appendChild(detail);$('overlay').classList.add('hidden');}
 function press(k){if(studio?.active||match.state!=='playing')return;keys.add(k);if(!MOVE_KEYS.includes(k)&&k!==' ')return;const id=resolveMovement(k,controlBindings,availableMoves(MOVES,match.p.characterId));if(!id){note(k===' '?'Assign a dodge in Studio to use Space':k.toUpperCase()+' is unassigned · choose a key in Studio');return;}if(match.p.action!=='idle'){note(match.p.action==='knockdown'?'Recovering · wait to stand up':'Finish the current movement, then press '+(k===' '?'Space':k.toUpperCase()));return;}match.act(match.p,id,input());}
-window.addEventListener('keydown',e=>{if(studio?.active||e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;let k=e.key.toLowerCase();if(!['w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','j','k','l',' ','q','e','p','r','u','i','o'].includes(k))return;if(e.target instanceof HTMLButtonElement&&k===' '&&match.state!=='playing')return;e.preventDefault();if(e.repeat)return;if(k==='p')pause();else if(k==='r'&&isReady&&match.state!=='ready')start(match.practice);else press(k);});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();if(match.state==='playing')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&match.state==='playing')pause();});
+window.addEventListener('keydown',e=>{if(studio?.active||e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;if(e.ctrlKey||e.metaKey||e.altKey)return;let k=e.key.toLowerCase();if(![...MOVE_KEYS,'w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','j','k','l',' ','q','e','p','r','u','i','o'].includes(k))return;if(e.target instanceof HTMLButtonElement&&k===' '&&match.state!=='playing')return;e.preventDefault();if(e.repeat)return;if(k==='p')pause();else if(k==='r'&&isReady&&match.state!=='ready')start(match.practice);else press(k);});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();if(match.state==='playing')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&match.state==='playing')pause();});
 for(const b of document.querySelectorAll('[data-key]')){b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);press(b.dataset.key);});for(const event of['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>keys.delete(b.dataset.key));}
 $('start').onclick=()=>{if(match.state==='paused')pause();else start(false);$('start').blur();};$('practice').onclick=()=>{start(true);$('practice').blur();};$('pause').onclick=pause;$('camera').onclick=()=>{cameraMode=(cameraMode+1)%4;camTarget=.12+cameraMode*Math.PI/2;};$('sound').onclick=async()=>{sound=!sound;if(sound){try{audio??=new(window.AudioContext||window.webkitAudioContext)();await audio.resume();tone(240);}catch{sound=false;note('Audio is unavailable in this browser');}}$('sound').textContent=sound?'Sound on':'Sound off';};
 

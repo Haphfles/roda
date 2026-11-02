@@ -1,5 +1,5 @@
-import {readStats,statEffects} from './character-stats.mjs?v=v0.1.24';
-import {createFighter,poseFighter} from './models.js?v=v0.1.24';
+import {readStats,statEffects} from './character-stats.mjs?v=v0.1.25';
+import {createFighter,poseFighter} from './models.js?v=v0.1.25';
 export function opponentOptions(skins,player){return Object.keys(skins).filter(id=>id!==player);}
 export class OpponentPicker{
  constructor(setup,match,rig,carousel,worlds){

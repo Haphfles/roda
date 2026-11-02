@@ -1,5 +1,5 @@
-import {inferImpactTurn} from './hit-direction.mjs?v=v0.1.24';
-import {travelKeys,validateTravel} from './root-motion.mjs?v=v0.1.24';
+import {inferImpactTurn} from './hit-direction.mjs?v=v0.1.25';
+import {travelKeys,validateTravel} from './root-motion.mjs?v=v0.1.25';
 export const JOINTS=[['root','Whole body'],['hips','Hips'],['torso','Chest'],['head','Head'],['armLU','Left shoulder'],['armLL','Left elbow'],['armRU','Right shoulder'],['armRL','Right elbow'],['legLU','Left hip'],['legLL','Left knee'],['footL','Left ankle'],['legRU','Right hip'],['legRL','Right knee'],['footR','Right ankle']];
 export const BINDINGS={j:'kick',k:'spin',l:'dodge',u:null,i:null,o:null};
 export const FORMAT='ginga-movement-studio';

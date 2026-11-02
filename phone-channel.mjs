@@ -18,7 +18,7 @@ export class PhoneInput{
  receive(m,now,active,allowed){if(!m||!validPair(m.client))return null;if(m.type==='hello'){if(!this.peer)this.peer=m.client;return m.client===this.peer?'hello':null;}if(m.client!==this.peer||!Number.isSafeInteger(m.seq)||m.seq<=this.seq)return null;
   this.seq=m.seq;this.last=now;
   if(m.type==='input'){if(!Number.isFinite(m.x)||!Number.isFinite(m.z)||!active){this.stop();return null;}const n=Math.max(1,Math.hypot(m.x,m.z));this.vector={x:m.x/n,z:m.z/n};}
-  if(m.type==='pause'&&now-this.lastAction>=300){this.lastAction=now;return 'pause';}
+  if(['pause','restart'].includes(m.type)&&now-this.lastAction>=(m.type==='restart'?500:300)){this.lastAction=now;return m.type;}
   if(m.type==='action'&&active&&allowed.includes(m.key)&&now-this.lastAction>=60){this.lastAction=now;return m.key;}return null;
  }
  stop(){this.vector={x:0,z:0};}

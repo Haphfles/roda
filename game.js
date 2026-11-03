@@ -1,26 +1,26 @@
-import {CommunityCharacters} from './community-characters.js?v=v0.1.30';
-import {SharedCharacters} from './shared-characters.js?v=v0.1.30';
-import {readStats} from './character-stats.mjs?v=v0.1.30';
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.30';
-import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.30';
-import {PhoneHost} from './phone-host.js?v=v0.1.30';
-import {OpponentPicker} from './opponent-picker.js?v=v0.1.30';
-import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.30';
-import {StudioFighters} from './studio-fighters.js?v=v0.1.30';
-import {CharacterCarousel} from './character-carousel.js?v=v0.1.30';
-import {loadingDone} from './loading-progress.js?v=v0.1.30';
-import {VoiceControls} from './voice-controls.js?v=v0.1.30';
-import {AnimationBlend} from './animation-blend.mjs?v=v0.1.30';
-import {MobileControls} from './mobile-controls.js?v=v0.1.30';
-import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.30';
-import {availableMoves} from './movement-access.mjs?v=v0.1.30';
-import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.30';
+import {CommunityCharacters} from './community-characters.js?v=v0.1.31';
+import {SharedCharacters} from './shared-characters.js?v=v0.1.31';
+import {readStats} from './character-stats.mjs?v=v0.1.31';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.31';
+import {ImpactShake,impactStrength,vibrateImpact} from './impact-feedback.mjs?v=v0.1.31';
+import {PhoneHost} from './phone-host.js?v=v0.1.31';
+import {OpponentPicker} from './opponent-picker.js?v=v0.1.31';
+import {anchorTrackedFeet} from './tracking-constraints.mjs?v=v0.1.31';
+import {StudioFighters} from './studio-fighters.js?v=v0.1.31';
+import {CharacterCarousel} from './character-carousel.js?v=v0.1.31';
+import {loadingDone} from './loading-progress.js?v=v0.1.31';
+import {VoiceControls} from './voice-controls.js?v=v0.1.31';
+import {AnimationBlend} from './animation-blend.mjs?v=v0.1.31';
+import {MobileControls} from './mobile-controls.js?v=v0.1.31';
+import {statEffects,moveEffects} from './character-stats.mjs?v=v0.1.31';
+import {availableMoves} from './movement-access.mjs?v=v0.1.31';
+import {controlRows,resolveMovement,MOVE_KEYS} from './movement-controls.mjs?v=v0.1.31';
 import * as THREE from 'three';
-import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.30';
-import {loadCharacterAssignment} from './character-loader.js?v=v0.1.30';
-import {MovementStudio} from './studio.js?v=v0.1.30';
-import {Match,MOVES} from './game-core.mjs?v=v0.1.30';
-import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.30';
+import {GameSetup,loadRosterCharacter,loadQuilombo} from './game-setup.js?v=v0.1.31';
+import {loadCharacterAssignment} from './character-loader.js?v=v0.1.31';
+import {MovementStudio} from './studio.js?v=v0.1.31';
+import {Match,MOVES} from './game-core.mjs?v=v0.1.31';
+import {createFighter,poseFighter,createWorld,applyCharacter,setFighterSkin} from './models.js?v=v0.1.31';
 const $=id=>document.getElementById(id),keys=new Set(),match=new Match();
 let phone,phone2,modePicker,lastPhoneRestart=-Infinity,opponents,carousel,setup,worlds,skins,studio,studioPrevious,renderer,scene,camera,world,rigP,rigB,camAngle=.12,camTarget=.12,clock=0,last=0,calloutUntil=0,sound=false,audio,beat=0,pausedFrom='playing',isReady=false,particles=[],trail=[],cameraMode=0;
 const mobile=new MobileControls(document.querySelector('.touch'),key=>{press(key);keys.delete(key);});
@@ -55,7 +55,7 @@ function tick(now){requestAnimationFrame(tick);const dt=Math.min((now-last)/1000
  for(const [rig,f]of [[rigP,match.p],[rigB,match.b]])if(rig.trackedFeet)anchorTrackedFeet(rig,f.stats?.flexibility);rigP.root.position.y=rigP.trackedFeet?0:match.p.travelY||0;rigB.root.position.y=rigB.trackedFeet?0:match.b.travelY||0;rigP.updateSkin?.();rigB.updateSkin?.();for(const s of world.spectators)s.rig.updateSkin?.();
  if(active){for(const p of particles){p.life-=dt;p.v.y-=dt*4;p.mesh.position.addScaledVector(p.v,dt);p.mesh.material.opacity=Math.max(0,p.life/p.max);}particles=particles.filter(p=>{if(p.life<=0){scene.remove(p.mesh);p.mesh.geometry.dispose();p.mesh.material.dispose();return false}return true});for(const p of trail)p.life-=dt;trail=trail.filter(p=>p.life>0);scene.updateMatrixWorld(true);addTrail(rigP,match.p);addTrail(rigB,match.b);trailLine.geometry.dispose();trailLine.geometry=new THREE.BufferGeometry().setFromPoints(trail.map(t=>t.p));trailLine.visible=trail.length>1;}
  if(match.state==='playing'){beat+=dt;if(beat>.45){beat=0;tone(Math.floor(clock/.45)%4===0?160:270,.13,.035);}if(clock>calloutUntil)$('callout').textContent=match.practice?'FREE PRACTICE · FOLLOW YOUR MOVEMENT KEYS':'MOVE WITH INTENTION';}updateHud();updateCamera(dt);updateMoveHints();resize();renderer.render(scene,ready?carousel.camera:camera);}
-function resize(){if(!renderer)return;const opening=carousel?.visible,el=opening?carousel.stage:$('viewport'),w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight);if(renderer.domElement.dataset.size===w+'x'+h)return;renderer.domElement.dataset.size=w+'x'+h;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();if(carousel){carousel.camera.aspect=w/h;carousel.camera.updateProjectionMatrix();}}
+function resize(){if(!renderer)return;const el=$('viewport'),w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight);if(renderer.domElement.dataset.size===w+'x'+h)return;renderer.domElement.dataset.size=w+'x'+h;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();if(carousel){carousel.camera.aspect=w/h;carousel.camera.updateProjectionMatrix();}}
 try{
  renderer=new THREE.WebGLRenderer({antialias:!matchMedia('(pointer:coarse)').matches,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,matchMedia('(pointer:coarse)').matches?1:1.5));renderer.shadowMap.enabled=!matchMedia('(pointer:coarse)').matches;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;$('world').appendChild(renderer.domElement);
  scene=new THREE.Scene();scene.background=new THREE.Color('#d5bda1');scene.fog=new THREE.Fog('#d5bda1',20,65);camera=new THREE.PerspectiveCamera(43,1,.1,130);scene.add(new THREE.HemisphereLight('#fff0cb','#637f6a',2.4));const sun=new THREE.DirectionalLight('#ffe0ad',3.5);sun.position.set(-6,11,7);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-14,right:14,top:14,bottom:-14,near:.5,far:40});sun.shadow.normalBias=.035;sun.shadow.bias=-.0002;scene.add(sun);const fill=new THREE.DirectionalLight('#bbd9da',.6);fill.position.set(6,5,-8);scene.add(fill);
@@ -77,7 +77,7 @@ try{
  const shared=new SharedCharacters({studio,setup,onApplied(){match.b.stats=readStats(match.b.characterId);scaleCharacter(rigB,match.b.characterId,world===worlds.quilombo?1.3:1);refreshControls(studio.bindings);}});const community=new CommunityCharacters({shared,setup,studio});setTimeout(async()=>{await shared.load();await community.loadCatalog();},100);
  resize();new ResizeObserver(resize).observe($('viewport'));isReady=true;loadingDone();$('start').disabled=false;$('practice').disabled=false;$('start').textContent='Enter the roda ↗';$('load-status').textContent='A game of movement & rhythm';requestAnimationFrame(tick);
  // Read-only diagnostics for repeatable browser smoke tests.
- window.ginga={match,scene,renderer,rigP,rigB,get ready(){return isReady},get cameraAngle(){return camAngle}};
+ window.ginga={match,scene,renderer,rigP,rigB,get selectionCamera(){return carousel?.camera},get ready(){return isReady},get cameraAngle(){return camAngle}};
 }catch(error){console.error(error);$('error').hidden=false;$('error').innerHTML='<h2>The 3D renderer couldn’t start.</h2><p>Check your connection and reload in a browser with WebGL 2 enabled.</p>';const detail=document.createElement('p');detail.textContent='Details: '+error.message;$('error').appendChild(detail);$('overlay').classList.add('hidden');}
 function press(k){if(studio?.active||match.state!=='playing')return;keys.add(k);if(!MOVE_KEYS.includes(k)&&k!==' ')return;const id=resolveMovement(k,controlBindings,availableMoves(MOVES,match.p.characterId));if(!id){note(k===' '?'Assign a dodge in Studio to use Space':k.toUpperCase()+' is unassigned · choose a key in Studio');return;}if(match.p.action!=='idle'){note(match.p.action==='knockdown'?'Recovering · wait to stand up':'Finish the current movement, then press '+(k===' '?'Space':k.toUpperCase()));return;}match.act(match.p,id,input());}
 window.addEventListener('keydown',e=>{if(studio?.active||e.target instanceof HTMLInputElement||e.target instanceof HTMLSelectElement||e.target instanceof HTMLTextAreaElement)return;if(e.ctrlKey||e.metaKey||e.altKey)return;let k=e.key.toLowerCase();if(![...MOVE_KEYS,'w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','j','k','l',' ','q','e','p','r','u','i','o'].includes(k))return;if(e.target instanceof HTMLButtonElement&&k===' '&&match.state!=='playing')return;e.preventDefault();if(e.repeat)return;if(k==='p')pause();else if(k==='r'&&isReady&&match.state!=='ready')start(match.practice);else press(k);});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();if(match.state==='playing')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&match.state==='playing')pause();});

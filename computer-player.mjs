@@ -1,6 +1,6 @@
-import {statEffects} from './character-stats.mjs?v=v0.1.30';
-import {canUseMove} from './movement-access.mjs?v=v0.1.30';
-import {physiqueEffects} from './character-physique.mjs?v=v0.1.30';
+import {statEffects} from './character-stats.mjs?v=v0.1.31';
+import {canUseMove} from './movement-access.mjs?v=v0.1.31';
+import {physiqueEffects} from './character-physique.mjs?v=v0.1.31';
 export function updateComputer(match,dt,moves,random=Math.random){
  const b=match.b,p=match.p,brain=match.brain??={wait:.45,recent:[],orbit:1};
  const attacks=Object.entries(moves).filter(([id,m])=>m.kind==='attack'&&canUseMove(m,b.characterId)&&b.energy>=m.cost);

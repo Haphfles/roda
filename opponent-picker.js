@@ -1,6 +1,6 @@
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.31';
-import {readStats,statEffects} from './character-stats.mjs?v=v0.1.31';
-import {createFighter,poseFighter} from './models.js?v=v0.1.31';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.32';
+import {readStats,statEffects} from './character-stats.mjs?v=v0.1.32';
+import {createFighter,poseFighter} from './models.js?v=v0.1.32';
 export function opponentOptions(skins,player){return Object.keys(skins).filter(id=>id!==player);}
 export class OpponentPicker{
  constructor(setup,match,rig,carousel,worlds){
@@ -17,7 +17,7 @@ export class OpponentPicker{
   if(!ids.includes(this.selected))this.selected=ids[0];
   if(signature!==this.last){this.select.replaceChildren();for(const id of ids){const option=document.createElement('option');option.value=id;option.textContent=this.setup.skins[id]?.displayName||this.setup.characterNames?.[id]||id;this.select.append(option);}this.last=signature;force=true;}
   this.select.value=this.selected||'';this.select.disabled=!ids.length;
-  if(force&&this.selected&&this.setup.skins[this.selected]){if(this.match.b.characterId!==this.selected||this.loaded!==this.setup.skins[this.selected]){this.setup.skins[this.selected](this.rig);this.loaded=this.setup.skins[this.selected];}this.match.b.characterId=this.selected;this.match.b.stats=readStats(this.selected);scaleCharacter(this.rig,this.selected,this.setup.selection.scenario==='quilombo'?1.3:1);try{localStorage.setItem('roda-opponent-v1',this.selected);}catch{}}
+  if(force&&this.selected&&this.setup.skins[this.selected]){if(this.match.b.characterId!==this.selected||this.loaded!==this.setup.skins[this.selected]){this.setup.skins[this.selected](this.rig);this.loaded=this.setup.skins[this.selected];}this.carousel.opponentId=this.selected;this.match.b.characterId=this.selected;this.match.b.stats=readStats(this.selected);scaleCharacter(this.rig,this.selected,this.setup.selection.scenario==='quilombo'?1.3:1);try{localStorage.setItem('roda-opponent-v1',this.selected);}catch{}}
  }
  update(dt,ready){
   this.sync();this.clock+=dt;

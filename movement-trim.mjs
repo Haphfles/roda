@@ -1,5 +1,5 @@
-import {clone,samplePose,validateMove} from './movement-data.mjs?v=v0.1.31';
-import {travelKeys,sampleTravel} from './root-motion.mjs?v=v0.1.31';
+import {clone,samplePose,validateMove} from './movement-data.mjs?v=v0.1.32';
+import {travelKeys,sampleTravel} from './root-motion.mjs?v=v0.1.32';
 export function trimMovement(input,start,end){
  const move=validateMove(input),duration=end-start;
  if(!Number.isFinite(start)||!Number.isFinite(end)||start<0||end>move.duration+1e-8||duration<.2-1e-8)throw Error('Keep at least 0.2 seconds, within the animation.');

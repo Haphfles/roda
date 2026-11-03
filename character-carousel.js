@@ -1,9 +1,10 @@
-import {lineupPositions} from './character-lineup.mjs?v=v0.1.31';
-import {scaleCharacter} from './character-physique.mjs?v=v0.1.31';
+import {lineupPositions} from './character-lineup.mjs?v=v0.1.32';
+import {readStats} from './character-stats.mjs?v=v0.1.32';
+import {scaleCharacter} from './character-physique.mjs?v=v0.1.32';
 import * as THREE from 'three';
-import {createFighter,poseFighter} from './models.js?v=v0.1.31';
+import {createFighter,poseFighter} from './models.js?v=v0.1.32';
 export class CharacterCarousel{
- constructor(setup,renderer){
+ constructor(setup,renderer,studio){this.studio=studio;this.time=0;
   this.setup=setup;this.renderer=renderer;this.scene=setup.scene;this.rigs=new Map();this.factories=new Map();this.selectionToken=0;
   const host=document.createElement('section');host.className='fighter-carousel';host.setAttribute('aria-label','Choose your fighter');host.innerHTML='<label class="fighter-select-label">Your fighter<select aria-label="Choose your fighter"></select></label><small class="fighter-selection-status" role="status">Click a fighter or choose a name.</small>';setup.host.before(host);this.host=host;this.select=host.querySelector('select');this.label=host.querySelector('small');this.select.onchange=()=>this.selectFighter(this.select.value);
   this.camera=new THREE.PerspectiveCamera(40,1,.1,130);this.ray=new THREE.Raycaster();this.pointer=new THREE.Vector2();
@@ -15,13 +16,14 @@ export class CharacterCarousel{
  async selectFighter(id){const token=++this.selectionToken;this.pending=id;this.refresh();const name=this.select.selectedOptions[0]?.textContent||id;this.label.textContent=this.setup.skins[id]?'Selecting '+name+'…':'Loading '+name+'…';try{if(!this.setup.skins[id])await this.setup.ensureCharacter(id);if(token!==this.selectionToken)return;this.setup.choose('character',id);this.label.textContent='Click a fighter or choose a name.';}catch(e){if(token===this.selectionToken)this.label.textContent='Could not load '+name+'. Select again to retry.';console.warn(e);}finally{if(token===this.selectionToken){this.pending=null;this.refresh();}}}
  update(dt,visible){
   if(this.visible!==visible){for(const rig of this.rigs.values())rig.openingPose=null;this.renderer.domElement.style.cursor=visible?'pointer':'';}this.visible=visible;this.host.hidden=!visible;this.marker.visible=visible;document.getElementById('overlay').classList.toggle('carousel-opening',visible);if(!visible)return;
-  const selected=this.setup.selection.character,ids=Object.keys(this.setup.skins);ids.sort((a,b)=>(a===selected?-1:b===selected?1:0));const scale=this.setup.selection.scenario==='quilombo'?1.3:1,radius=this.setup.worlds[this.setup.selection.scenario].arenaRadius??4.5,positions=lineupPositions(ids.length,radius,1.45*scale);
+  this.time+=dt;const selected=this.setup.selection.character,opponent=this.opponentId,ids=Object.keys(this.setup.skins);const rank=id=>id===selected?0:id===opponent?1:2;ids.sort((a,b)=>rank(a)-rank(b));const scale=this.setup.selection.scenario==='quilombo'?1.3:1,radius=this.setup.worlds[this.setup.selection.scenario].arenaRadius??4.5,positions=lineupPositions(ids.length,radius,1.45*scale);if(ids.length>1){positions[0]={x:-.78*scale,z:.85*scale};positions[1]={x:.78*scale,z:.85*scale};const back=lineupPositions(ids.length-2,radius,1.35*scale);for(let i=2;i<ids.length;i++){const p=back[i-2];p.z-=1.1*scale;const n=Math.hypot(p.x,p.z),k=Math.min(1,radius*.88/Math.max(n,.01));positions[i]={x:p.x*k,z:p.z*k};}}
   for(const [i,id]of ids.entries()){
    let rig=this.rigs.get(id);if(!rig){rig=createFighter();this.rigs.set(id,rig);this.scene.add(rig.root);}if(this.factories.get(id)!==this.setup.skins[id]){this.setup.skins[id](rig);this.factories.set(id,this.setup.skins[id]);rig.openingPose=null;}rig.root.userData.fighterId=id;rig.root.visible=true;scaleCharacter(rig,id,scale);
-   const point=positions[i],key=[point.x,point.z,rig.root.scale.x,i].join(':');if(rig.openingPose!==key){
+   const point=positions[i],key=[point.x,point.z,rig.root.scale.x,i,id===selected||id===opponent].join(':');if(rig.openingPose!==key){
     poseFighter(rig,{x:point.x,z:point.z,heading:0,action:'idle',t:0},0);rig.hips.position.y=.925;rig.legs.l.upper.rotation.set(0,0,0);rig.legs.r.upper.rotation.set(0,0,0);rig.legs.l.lower.rotation.set(0,0,0);rig.legs.r.lower.rotation.set(0,0,0);rig.legs.l.foot.rotation.set(0,0,0);rig.legs.r.foot.rotation.set(0,0,0);rig.torso.rotation.set(0,i%2?.06:-.06,0);rig.arms.l.upper.rotation.set(-.25,0,-.18);rig.arms.r.upper.rotation.set(-.15,0,.18);rig.arms.l.lower.rotation.set(-1.05,0,-.15);rig.arms.r.lower.rotation.set(-.85,0,.15);rig.root.position.y=0;rig.lineupLift=0;rig.updateSkin?.();
-    if(rig.importedModel){rig.importedModel.updateMatrixWorld(true);rig.importedModel.traverse(o=>{if(o.isSkinnedMesh)o.computeBoundingBox();});const bounds=new THREE.Box3().setFromObject(rig.importedModel);rig.root.position.y=-bounds.min.y;rig.updateSkin?.();}rig.openingPose=key;
+    if(rig.importedModel){rig.importedModel.updateMatrixWorld(true);rig.importedModel.traverse(o=>{if(o.isSkinnedMesh)o.computeBoundingBox();});const bounds=new THREE.Box3().setFromObject(rig.importedModel);rig.root.position.y=-bounds.min.y;rig.updateSkin?.();}rig.openingPose=key;rig.openingSoleOffset=Math.min(rig.legs.l.foot.getWorldPosition(new THREE.Vector3()).y,rig.legs.r.foot.getWorldPosition(new THREE.Vector3()).y);
    }
+   if(id===selected||id===opponent){const f={x:point.x,z:point.z,heading:0,action:'idle',t:0,characterId:id,stats:readStats(id)};poseFighter(rig,f,this.time+i*.35);this.studio?.pose(rig,f,this.time+i*.35);rig.root.rotation.y=0;rig.root.position.set(point.x,0,point.z);rig.updateSkin?.();const sole=Math.min(rig.legs.l.foot.getWorldPosition(new THREE.Vector3()).y,rig.legs.r.foot.getWorldPosition(new THREE.Vector3()).y);rig.root.position.y=(rig.openingSoleOffset||0)-sole;rig.updateSkin?.();}
    if(id===selected){this.marker.position.set(point.x,.018,point.z);this.marker.scale.setScalar(scale);}
   }
   const w=this.renderer.domElement.clientWidth||1,h=this.renderer.domElement.clientHeight||1,aspect=w/h,width=Math.max(2.8,...positions.map(p=>Math.abs(p.x)*2+1.2*scale)),distance=Math.max(6.6,width/(2*Math.tan(THREE.MathUtils.degToRad(20))*aspect));this.camera.aspect=aspect;this.camera.position.set(0,Math.max(3.2,distance*.37),distance);this.camera.lookAt(0,.8,0);this.camera.setViewOffset(w,h,0,h*(aspect<.8?.13:.12),w,h);this.camera.updateProjectionMatrix();
